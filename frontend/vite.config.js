@@ -47,4 +47,8 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  build: {
+    outDir: '../backend/src/main/resources/static',
+    publicDir: 'static',
+  }
 })
