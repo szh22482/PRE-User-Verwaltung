@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository extends Repository<User, UUID> {
-    void save(User user);
+    User save(User user);
     User findById(UUID id);
     User findByEmail(String email);
     User findByLastname(String lastname);

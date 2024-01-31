@@ -10,7 +10,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 public interface UserToRolesRepository extends Repository<UserToRoles, UserToRolesId> {
-    void save(UserToRoles userToRoles);
+    UserToRoles save(UserToRoles userToRoles);
 
     @Modifying
     @Transactional
