@@ -1,10 +1,8 @@
 package at.spengergasse.backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.sql.Date;
@@ -19,8 +17,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tb_users")
-public class User extends AbstractPersistable<Long> {
+public class User {
 
+    @Id
+    @UuidGenerator
     private UUID id;
     private String firstname;
     private String lastname;
