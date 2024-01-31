@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tb_roles")
