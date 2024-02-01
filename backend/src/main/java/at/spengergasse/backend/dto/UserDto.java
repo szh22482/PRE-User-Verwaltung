@@ -3,6 +3,7 @@ package at.spengergasse.backend.dto;
 import at.spengergasse.backend.model.User;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,8 +14,8 @@ public record UserDto (
         String email,
         String password,
         Boolean deleted,
-        Date created,
-        Date deletedDate,
+        LocalDate created,
+        LocalDate deletedDate,
         List<String> roles
         )
 {
