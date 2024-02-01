@@ -3,9 +3,11 @@ package at.spengergasse.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,11 +26,12 @@ public class User {
     private UUID id;
     private String firstname;
     private String lastname;
+    @Column(unique = true)
     private String email;
     private String password;
     private Boolean deleted;
-    private Date created;
-    private Date deletedDate;
+    private LocalDate created;
+    private LocalDate deletedDate;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserToRoles> roles;
