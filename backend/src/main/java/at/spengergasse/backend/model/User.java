@@ -1,12 +1,11 @@
 package at.spengergasse.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
-import org.springframework.cglib.core.Local;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +25,9 @@ public class User {
     private UUID id;
     private String firstname;
     private String lastname;
+    @Min(value = 0, message = "Number must be at least 0")
+    @Max(value = 9, message = "Number must be at most 9")
+    private int colorNumber; //number between 0 and 9
     @Column(unique = true)
     private String email;
     private String password;
