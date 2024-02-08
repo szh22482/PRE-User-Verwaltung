@@ -16,7 +16,8 @@ public record UserDto (
         Boolean deleted,
         LocalDate created,
         LocalDate deletedDate,
-        List<String> roles
+        List<String> roles,
+        int colorNumber
         )
 {
         //This method is used to convert an entity to a dto for the service layer
@@ -30,7 +31,8 @@ public record UserDto (
                         user.getDeleted(),
                         user.getCreated(),
                         user.getDeletedDate(),
-                        user.getRoles()
+                        user.getRoles(),
+                        user.getColorNumber()
                 );
         }
 

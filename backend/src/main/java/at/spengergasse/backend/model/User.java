@@ -40,7 +40,16 @@ public class User {
     private List<UserToRoles> roles;
 
     public List<String> getRoles() {
-        return roles.stream().map(r -> r.getRole().getRoleName().toString()).collect(Collectors.toList());
+        return roles.stream()
+                .map(r -> capitalizeFirstLetter(r.getRole().getRoleName().toString()))
+                .collect(Collectors.toList());
+    }
+
+    private String capitalizeFirstLetter(String roleName) {
+        if (roleName == null || roleName.isEmpty()) {
+            return roleName;
+        }
+        return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase();
     }
 
     public List<UserToRoles> toRoles(List<String> roles) {
