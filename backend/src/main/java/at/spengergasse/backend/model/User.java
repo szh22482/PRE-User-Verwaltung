@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @ToString
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
@@ -40,5 +41,13 @@ public class User {
 
     public List<String> getRoles() {
         return roles.stream().map(r -> r.getRole().getRoleName().toString()).collect(Collectors.toList());
+    }
+
+    public List<UserToRoles> toRoles(List<String> roles) {
+        return roles.stream().map(role -> UserToRoles.builder()
+                .id(new UserToRolesId(this.getId(), Role.builder().roleName(ERoles.valueOf(role)).build().getId()))
+                .user(this)
+                .role(Role.builder().roleName(ERoles.valueOf(role)).build()).build())
+                .collect(Collectors.toList());
     }
 }

@@ -11,7 +11,6 @@ public record UserDto (
         UUID id,
         String firstname,
         String lastname,
-        int colorNumber,
         String email,
         String password,
         Boolean deleted,
@@ -26,7 +25,6 @@ public record UserDto (
                         user.getId(),
                         user.getFirstname(),
                         user.getLastname(),
-                        user.getColorNumber(),
                         user.getEmail(),
                         user.getPassword(),
                         user.getDeleted(),
@@ -34,5 +32,19 @@ public record UserDto (
                         user.getDeletedDate(),
                         user.getRoles()
                 );
+        }
+
+        //This method is used to convert a dto to an entity for the service layer
+        public static User toEntity(UserDto userDto) {
+                return User.builder()
+                        .firstname(userDto.firstname())
+                        .lastname(userDto.lastname())
+                        .email(userDto.email())
+                        .password(userDto.password())
+                        .deleted(false)
+                        .created(LocalDate.now())
+                        .deletedDate(null)
+                        .roles(null) //roles will be set later on
+                        .build();
         }
 }
