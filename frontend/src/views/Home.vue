@@ -1,15 +1,19 @@
 <template>
   <v-container fluid class="container">
-    <v-data-table
+    <div class="title">Users</div>
+    <div class="subtitle">view and manage users</div>
+
+    <v-data-table 
+      class="table rounded-lg"
       :items="users"
       :headers="dynamicHeaders"
     >
       <template v-slot:headers>
-        <tr>
-          <th class="text-left table-head">User</th>
-          <th v-if="!isSmallScreen" class="text-left table-head">Created</th>
-          <th class="text-left table-head">Roles</th>
-          <th class="text-left table-head"></th>
+        <tr class="table-head">
+          <th>User</th>
+          <th v-if="!isSmallScreen">Created</th>
+          <th>Roles</th>
+          <th></th>
         </tr>
       </template>
 
@@ -24,7 +28,7 @@
             <span class="username collapsible-text" :class="{'collapsible-small-screen': colapse}">
               {{ item.firstname }} {{ item.lastname }}
             </span>
-            <span class="collapsible-text" :class="{'collapsible-small-screen': colapse}">
+            <span class="collapsible-text email" :class="{'collapsible-small-screen': colapse}">
               {{ item.email }}
             </span>
         </div>
@@ -36,25 +40,25 @@
       </template>
 
       <template v-slot:item.roles="{ item }">
-        <div v-if="!colapse && item.roles && item.roles.length > 0">
-              <v-chip v-if="item.roles[0]">
-                {{ item.roles[0] }}
-              </v-chip>
-              <span v-if="item.roles.length > 1" class="text-grey text-caption">
-                (+{{ item.roles.length - 1 }} other<span v-if="item.roles.length > 2">s</span>)
-              </span>
-            </div>
-            <div v-if="colapse && item.roles && item.roles.length > 0">
-              <v-chip>{{ item.roles[0] }}<span v-if="item.roles.length > 1">, ...</span></v-chip>
-            </div>
+        <div v-if="item.roles && item.roles.length > 0">
+          <v-chip 
+            class="role" 
+            v-for="(role, index) in item.roles" 
+            :key="index"
+            :style="roleStyle(role)"
+          >
+            {{ role }}
+          </v-chip>
+        </div>
       </template>
 
       <template v-slot:item.actions="{ item }">
         <div class="align-horizonally">
-          <v-icon @click="editUser(item)" class="mr-2">mdi-pencil</v-icon>
-          <v-icon @click="deleteUser(item)">mdi-delete</v-icon>
+          <v-icon>mdi-dots-vertical</v-icon>
         </div>
       </template>
+
+      <template v-slot:bottom> </template> <!-- removes the default footer -->
     </v-data-table>
   </v-container>
 </template>
@@ -71,15 +75,23 @@ export default {
       isSmallScreen: false,
       colapse: false,
       users: [],
+      roleColors: {
+        Administrator: { background: '#e2ecf7', color: '#1c6ac1' },
+        Auditor: { background: '#e8f5e9', color: '#5fb762' },
+        Auditee: { background: '#dff6f9', color: '#00bcd4' },
+        Reporter: { background: '#fde7e5', color: '#f44336' },
+        Gast: { background: '#fff2df', color: '#ff9800' },
+        'Manual writer': { background: '#d1c4e9', color: '#7e57c2' }
+      }
     }
   },
   computed: {
     dynamicHeaders() {
       let headers = [
-        { text: 'User', value: 'fullname'},
-        ...(!this.isSmallScreen ? [{ text: 'Created', value: 'created' }] : []),
-        { text: 'Roles', value: 'roles' },
-        { text: '', value: 'actions', sortable: false, width: '30px' },
+        { text: 'User', value: 'fullname', sortable: true},
+        ...(!this.isSmallScreen ? [{ text: 'Created', value: 'created', sortable: true}] : []),
+        { text: 'Roles', value: 'roles', sortable: false},
+        { text: '', value: 'actions', sortable: false, width: '30px', sortable: false},
       ];
       return headers;
     },
@@ -108,11 +120,40 @@ export default {
       this.colapse = window.innerWidth < 650;
       this.marginWidth = this.isSmallScreen ? '0px' : '70px';
     },
+    roleStyle(role) {
+      const defaultStyle = { background: '#eeeeee', color: '#000000' };
+      return this.roleColors[role] || defaultStyle;
+    }
   }
 }
 </script>
 
 <style>
+  .title {
+    color: black;
+    font-size: 30px;
+  }
+
+  .subtitle {
+    color: black;
+    font-size: 20px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+  }
+
+  .table {
+    border: solid 1px #e0e0e0;
+  }
+
+  .table-head {
+    background-color: #f9fafc;
+  }
+
+  .role {
+    margin-right: 5px;
+    margin-block: 5px;
+  }
+
   .container {
     margin: 20px;
   }
@@ -123,6 +164,12 @@ export default {
 
   .username {
     font-weight: bold;
+    font-size: 16px;  
+  }
+
+  .email {
+    font-size: 14px;
+    color: #707070;
   }
 
   .collapsible-text {
@@ -136,6 +183,6 @@ export default {
     /* 
     TODO: width should gradually decrease with the screen size
     */
-    max-width: 70px;
+    max-width: 95px;
   }
 </style>

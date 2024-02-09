@@ -49,6 +49,7 @@ public class User {
         if (roleName == null || roleName.isEmpty()) {
             return roleName;
         }
+        roleName = roleName.replace("_", " ");
         return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase();
     }
 
