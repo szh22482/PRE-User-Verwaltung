@@ -1,7 +1,7 @@
 package at.spengergasse.backend.controller;
 
 import at.spengergasse.backend.dto.UserDto;
-import at.spengergasse.backend.persistence.UserRepository;
+import at.spengergasse.backend.dto.UserRequest;
 import at.spengergasse.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,5 +26,10 @@ public class UserController {
     @GetMapping("/login")
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         return userService.loginUser(email, password);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addUser(@RequestBody UserRequest user) {
+        return userService.addUser(user);
     }
 }

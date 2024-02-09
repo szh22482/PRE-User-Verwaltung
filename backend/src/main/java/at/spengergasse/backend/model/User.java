@@ -41,4 +41,8 @@ public class User {
     public List<String> getRoles() {
         return roles.stream().map(r -> r.getRole().getRoleName().toString()).collect(Collectors.toList());
     }
+
+    public void setRoles(List<UserToRoles> roles) {
+        this.roles = roles;
+    }
 }
