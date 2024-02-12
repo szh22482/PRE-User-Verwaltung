@@ -27,4 +27,9 @@ public class UserController {
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         return userService.loginUser(email, password);
     }
+
+    @PutMapping("/edit")
+    public ResponseEntity<?> editUser(@RequestBody UserDto userDto) {
+        return userService.editUser(userDto);
+    }
 }
