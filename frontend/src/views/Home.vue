@@ -40,16 +40,62 @@
       </template>
 
       <template v-slot:item.roles="{ item }">
-        <div v-if="item.roles && item.roles.length > 0">
-          <v-chip 
-            class="role" 
-            v-for="(role, index) in item.roles" 
-            :key="index"
-            :style="roleStyle(role)"
-          >
-            {{ role }}
-          </v-chip>
-        </div>
+          <v-dialog>
+            <template v-slot:activator="{ props }">
+              <div v-if="!colapse && item.roles && item.roles.length > 0">
+                <v-chip 
+                  class="role" 
+                  v-for="(role, index) in item.roles" 
+                  :key="index"
+                  :style="roleStyle(role)"
+                >
+                  {{ role }}
+                </v-chip>
+              </div>
+
+              <div v-else>
+                <v-chip
+                  class="role"
+                  :style="roleStyle(item.roles[0])"
+                  v-bind="props"
+                >
+                {{ item.roles[0] }}&nbsp;<span v-if="item.roles.length > 1">(+{{ item.roles.length - 1 }})</span>
+                </v-chip>
+              </div>
+            </template>
+
+            <template v-slot:default="{ isActive }">
+              <v-card class="rounded-lg">
+                <v-card-text>
+                  <span class="username">
+                    {{ item.firstname }} {{ item.lastname }} <br>
+                  </span>
+                  <span class="email">
+                    {{ item.email }}
+                  </span>
+
+                  <v-divider class="my-4"></v-divider>
+
+                  <v-chip 
+                  class="role" 
+                  v-for="(role, index) in item.roles" 
+                  :key="index"
+                  :style="roleStyle(role)"
+                  >
+                    {{ role }}
+                  </v-chip>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text="Close"
+                    @click="isActive.value = false"
+                  ></v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog> 
       </template>
 
       <template v-slot:item.actions="{ item }">
@@ -180,9 +226,7 @@ export default {
   }
 
   .collapsible-small-screen {
-    /* 
-    TODO: width should gradually decrease with the screen size
-    */
-    max-width: 95px;
+    /* TODO: width should gradually decrease with the screen size */
+    max-width: 80px;
   }
 </style>
