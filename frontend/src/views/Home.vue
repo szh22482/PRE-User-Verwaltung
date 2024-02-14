@@ -18,21 +18,87 @@
       </template>
 
       <template v-slot:item.fullname="{ item }">
-        <div class="align-horizonally">
-          <profile-picture v-if="!colapse"
-            :firstname="item.firstname"
-            :lastname="item.lastname"
-            :colorNr="item.colorNumber"
-          />
-          <div>
-            <span class="username collapsible-text" :class="{'collapsible-small-screen': colapse}">
-              {{ item.firstname }} {{ item.lastname }}
-            </span>
-            <span class="collapsible-text email" :class="{'collapsible-small-screen': colapse}">
-              {{ item.email }}
-            </span>
-        </div>
-      </div>
+        <v-dialog>
+          <template v-slot:activator="{ props }">
+            <div class="align-horizonally" v-bind="props">
+              <profile-picture v-if="!colapse"
+                :firstname="item.firstname"
+                :lastname="item.lastname"
+                :colorNr="item.colorNumber"
+              />
+              <div>
+                <span class="username collapsible-text" :class="{'collapsible-small-screen': colapse}">
+                  {{ item.firstname }} {{ item.lastname }}
+                </span>
+                <span class="collapsible-text email" :class="{'collapsible-small-screen': colapse}">
+                  {{ item.email }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template v-slot:default="{ isActive }">
+            <v-container class="d-flex justify-center align-center">
+              <v-card width="800" class="rounded-lg">
+              <v-card-text>
+                  <v-row justify="space-between pt-1">
+                    <v-col cols="7">
+                      <span class="username text-truncate" :style="{ 'padding-left': '20px' }">
+                        {{ item.firstname }} {{ item.lastname }}
+                      </span>
+                    </v-col>
+                    <v-col class="text-right" cols="5">
+                      <v-icon color="grey-darken-4">mdi-pencil</v-icon>
+                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">mdi-delete</v-icon>
+                    </v-col>
+                  </v-row>
+
+                  <v-divider class="my-4"></v-divider>
+                <v-row>
+                    <v-col class="user-label">Firstname</v-col>
+                    <v-col class="user-info"> {{ item.firstname }} </v-col>
+                </v-row>
+                <v-row>
+                    <v-col class="user-label">Lastname </v-col>
+                    <v-col class="user-info"> {{ item.lastname }} </v-col>
+                </v-row>
+                <v-row>
+                    <v-col class="user-label">Email </v-col>
+                    <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
+                </v-row>
+                <v-row>
+                    <v-col class="user-label">Created </v-col>
+                    <v-col class="user-info"> {{ new Date(item.created).toLocaleDateString("de-DE") }}</v-col>
+                </v-row>
+                <v-row>
+                    <v-col class="user-label">Password </v-col>
+                    <v-col class="user-info"> {{ item.password }} </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="user-label"> Roles </v-col>
+                    <v-col>
+                      <v-chip 
+                      class="role" 
+                      v-for="(role, index) in item.roles" 
+                      :key="index"
+                      :style="roleStyle(role)"
+                      >
+                        {{ role }}
+                      </v-chip>
+                    </v-col>
+                </v-row>
+              </v-card-text>
+
+              <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      text="Close"
+                      @click="isActive.value = false"
+                    ></v-btn>
+                  </v-card-actions>
+              </v-card>
+          </v-container>
+          </template>
+        </v-dialog>
       </template>
 
       <template v-slot:item.created="{ item }">
@@ -99,73 +165,7 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-dialog>
-          <template v-slot:activator="{ props }">
-            <v-icon v-bind="props">mdi-dots-vertical</v-icon>
-          </template>
-          <template v-slot:default="{ isActive }">
-            <v-container class="d-flex justify-center align-center">
-              <v-card width="800" class="rounded-lg">
-              <v-card-text>
-                  <v-row justify="space-between pt-1">
-                    <v-col cols="7">
-                      <span class="username text-truncate" :style="{ 'padding-left': '20px' }">
-                        {{ item.firstname }} {{ item.lastname }}
-                      </span>
-                    </v-col>
-                    <v-col class="text-right" cols="5">
-                      <v-icon color="grey-darken-4">mdi-pencil</v-icon>
-                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">mdi-delete</v-icon>
-                    </v-col>
-                  </v-row>
-
-                  <v-divider class="my-4"></v-divider>
-                <v-row>
-                    <v-col class="user-label">Firstname</v-col>
-                    <v-col class="user-info"> {{ item.firstname }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Lastname </v-col>
-                    <v-col class="user-info"> {{ item.lastname }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Email </v-col>
-                    <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Created </v-col>
-                    <v-col class="user-info"> {{ new Date(item.created).toLocaleDateString("de-DE") }}</v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Password </v-col>
-                    <v-col class="user-info"> {{ item.password }} </v-col>
-                </v-row>
-                <v-row>
-                  <v-col class="user-label"> Roles </v-col>
-                    <v-col>
-                      <v-chip 
-                      class="role" 
-                      v-for="(role, index) in item.roles" 
-                      :key="index"
-                      :style="roleStyle(role)"
-                      >
-                        {{ role }}
-                      </v-chip>
-                    </v-col>
-                </v-row>
-              </v-card-text>
-
-              <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      text="Close"
-                      @click="isActive.value = false"
-                    ></v-btn>
-                  </v-card-actions>
-              </v-card>
-          </v-container>
-          </template>
-        </v-dialog>
+        <v-icon v-bind="props">mdi-dots-vertical</v-icon>
       </template>
 
       <template v-slot:bottom> </template> <!-- removes the default footer -->
@@ -271,6 +271,7 @@ export default {
   .align-horizonally {
     display: flex;
     align-items: center; 
+    cursor: pointer;
   }
 
   .username {
