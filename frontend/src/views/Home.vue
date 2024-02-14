@@ -1,18 +1,16 @@
 <template>
-  <v-container fluid class="container">
-    <div class="title">Users</div>
-    <div class="subtitle">view and manage users</div>
-
+  <v-container fluid class="ma-1">
     <v-data-table 
-      class="table rounded-lg"
+      class="rounded-lg"
+      :style="{ 'border': 'solid 1px #e0e0e0' }"
       :items="users"
       :headers="dynamicHeaders"
     >
       <template v-slot:headers>
-        <tr class="table-head">
+        <tr :style="{ 'backgroung-color': '#f9fafc' }">
           <th>User</th>
           <th v-if="!isSmallScreen">Created</th>
-          <th>Roles</th>
+          <th v-if="!colapseRole">Roles</th>
           <th></th>
         </tr>
       </template>
@@ -21,72 +19,83 @@
         <v-dialog>
           <template v-slot:activator="{ props }">
             <div class="align-horizonally" v-bind="props">
-              <profile-picture v-if="!colapse"
+              <profile-picture
                 :firstname="item.firstname"
                 :lastname="item.lastname"
                 :colorNr="item.colorNumber"
               />
               <div>
-                <span class="username collapsible-text" :class="{'collapsible-small-screen': colapse}">
+                <span class="username collapsible-text">
                   {{ item.firstname }} {{ item.lastname }}
                 </span>
-                <span class="collapsible-text email" :class="{'collapsible-small-screen': colapse}">
+                <span class="collapsible-text email">
                   {{ item.email }}
                 </span>
               </div>
             </div>
           </template>
+
           <template v-slot:default="{ isActive }">
             <v-container class="d-flex justify-center align-center">
               <v-card width="800" class="rounded-lg">
-              <v-card-text>
+                <v-card-text>
                   <v-row justify="space-between pt-1">
                     <v-col cols="7">
-                      <span class="username text-truncate" :style="{ 'padding-left': '20px' }">
+                      <span 
+                        class="username text-truncate" 
+                        :style="{ 'padding-left': '20px' }">
                         {{ item.firstname }} {{ item.lastname }}
                       </span>
                     </v-col>
+
                     <v-col class="text-right" cols="5">
-                      <v-icon color="grey-darken-4">mdi-pencil</v-icon>
-                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">mdi-delete</v-icon>
+                      <v-icon color="grey-darken-4">
+                        mdi-pencil
+                      </v-icon>
+                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">
+                        mdi-delete
+                      </v-icon>
                     </v-col>
                   </v-row>
 
                   <v-divider class="my-4"></v-divider>
-                <v-row>
-                    <v-col class="user-label">Firstname</v-col>
-                    <v-col class="user-info"> {{ item.firstname }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Lastname </v-col>
-                    <v-col class="user-info"> {{ item.lastname }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Email </v-col>
-                    <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Created </v-col>
-                    <v-col class="user-info"> {{ new Date(item.created).toLocaleDateString("de-DE") }}</v-col>
-                </v-row>
-                <v-row>
-                    <v-col class="user-label">Password </v-col>
-                    <v-col class="user-info"> {{ item.password }} </v-col>
-                </v-row>
-                <v-row>
-                  <v-col class="user-label"> Roles </v-col>
-                    <v-col>
-                      <v-chip 
-                      class="role" 
-                      v-for="(role, index) in item.roles" 
-                      :key="index"
-                      :style="roleStyle(role)"
-                      >
-                        {{ role }}
-                      </v-chip>
-                    </v-col>
-                </v-row>
-              </v-card-text>
+
+                  <v-row>
+                      <v-col class="user-label">Firstname</v-col>
+                      <v-col class="user-info"> {{ item.firstname }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Lastname </v-col>
+                      <v-col class="user-info"> {{ item.lastname }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Email </v-col>
+                      <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Created </v-col>
+                      <v-col class="user-info"> 
+                        {{ new Date(item.created).toLocaleDateString("de-DE") }}
+                      </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Password </v-col>
+                      <v-col class="user-info"> {{ item.password }} </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="user-label"> Roles </v-col>
+                      <v-col>
+                        <v-chip 
+                        class="role" 
+                        v-for="(role, index) in item.roles" 
+                        :key="index"
+                        :style="roleStyle(role)"
+                        >
+                          {{ role }}
+                        </v-chip>
+                      </v-col>
+                  </v-row>
+                </v-card-text>
 
               <v-card-actions>
                     <v-spacer></v-spacer>
@@ -108,24 +117,24 @@
       <template v-slot:item.roles="{ item }">
           <v-dialog>
             <template v-slot:activator="{ props }">
-              <div v-if="!colapse && item.roles && item.roles.length > 0">
+              <div v-if="!colapseDate && item.roles && item.roles.length > 0">
                 <v-chip 
                   class="role" 
                   v-for="(role, index) in item.roles" 
                   :key="index"
-                  :style="roleStyle(role)"
-                >
-                  {{ role }}
+                  :style="roleStyle(role)">
+                    {{ role }}
                 </v-chip>
               </div>
-
               <div v-else>
                 <v-chip
                   class="role"
                   :style="roleStyle(item.roles[0])"
                   v-bind="props"
+                  v-if="!colapseRole"
                 >
-                {{ item.roles[0] }}&nbsp;<span v-if="item.roles.length > 1">(+{{ item.roles.length - 1 }})</span>
+                {{ item.roles[0] }}&nbsp;
+                <span v-if="item.roles.length > 1">(+{{ item.roles.length - 1 }})</span>
                 </v-chip>
               </div>
             </template>
@@ -197,7 +206,8 @@ export default {
   data() {
     return {
       isSmallScreen: false,
-      colapse: false,
+      colapseDate: false,
+      colapseRole: false,
       users: [],
       roleColors: {
         Administrator: { background: '#e2ecf7', color: '#1c6ac1' },
@@ -214,7 +224,7 @@ export default {
       let headers = [
         { text: 'User', value: 'fullname', sortable: true},
         ...(!this.isSmallScreen ? [{ text: 'Created', value: 'created', sortable: true}] : []),
-        { text: 'Roles', value: 'roles', sortable: false},
+        ...(!this.colapseRole ? [{ text: 'Roles', value: 'roles', sortable: false}] : []),
         { text: '', value: 'actions', sortable: false, width: '30px', sortable: false},
       ];
       return headers;
@@ -242,7 +252,8 @@ export default {
   methods: {
     checkScreenSize() {
       this.isSmallScreen = window.innerWidth < 960;
-      this.colapse = window.innerWidth < 650;
+      this.colapseDate = window.innerWidth < 750;
+      this.colapseRole = window.innerWidth < 560;
       this.marginWidth = this.isSmallScreen ? '0px' : '70px';
     },
     roleStyle(role) {
@@ -254,34 +265,11 @@ export default {
 </script>
 
 <style>
-  .title {
-    color: black;
-    font-size: 30px;
-  }
-
-  .subtitle {
-    color: black;
-    font-size: 20px;
-    margin-top: -10px;
-    margin-bottom: 20px;
-  }
-
-  .table {
-    border: solid 1px #e0e0e0;
-  }
-
-  .table-head {
-    background-color: #f9fafc;
-  }
-
   .role {
     margin-right: 5px;
     margin-block: 5px;
   }
 
-  .container {
-    margin: 20px;
-  }
   .align-horizonally {
     display: flex;
     align-items: center; 
@@ -303,11 +291,7 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
-  }
-
-  .collapsible-small-screen {
-    /* TODO: width should gradually decrease with the screen size */
-    max-width: 80px;
+    max-width: 400px;
   }
 
   .user-info {
