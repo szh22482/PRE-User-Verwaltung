@@ -165,7 +165,21 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-icon v-bind="props">mdi-dots-vertical</v-icon>
+        <v-menu location="start">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props">mdi-dots-vertical</v-icon>
+          </template>
+
+          <v-card>
+            <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button">
+              Edit user
+            </v-btn>
+            <v-divider></v-divider>
+              <v-btn variant="text" prepend-icon="mdi-delete" block>
+                Delete user
+              </v-btn>
+          </v-card>
+        </v-menu>
       </template>
 
       <template v-slot:bottom> </template> <!-- removes the default footer -->
@@ -304,5 +318,10 @@ export default {
     font-weight: bold;
     color: #616161;
     margin-left: 20px;
+  }
+
+  .edit-button {
+    display: flex;
+    justify-content: start !important;
   }
 </style>
