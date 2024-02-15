@@ -36,12 +36,14 @@ public class UserService {
     }
 
     public ResponseEntity<String> loginUser(String email, String password) {
+        //Check if user exists in database
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if(optionalUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Login, Email wrong");
         }
 
+        //Get actual user from optional
         User user = optionalUser.get();
 
         if(!checkPassword(user, password)) {
@@ -51,28 +53,7 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("Login Successful!");
     }
 
-    //TODO: Test method before merging into main!!!
-    public ResponseEntity<?> addUser(UserDto userDto) {
-        User user = UserDto.toEntity(userDto);
-
-        List<UserToRoles> userToRoles = new ArrayList<>();
-        userDto.roles().forEach(role -> {
-            userToRoles.add(UserToRoles.builder()
-                    .id(new UserToRolesId(user.getId(), roleRepository.findByRoleName(ERoles.valueOf(role)).getId()))
-                    .user(user)
-                    .role(roleRepository.findByRoleName(ERoles.valueOf(role)))
-                    .build());
-        });
-
-        user.setRoles(userToRoles);
-
-        userRepository.save(user);
-        return ResponseEntity.ok("User added");
-    }
-
     private boolean checkPassword(User user, String password) {
         return user.getPassword().equals(password);
     }
-
-
 }

@@ -179,7 +179,7 @@
             <v-icon v-bind="props">mdi-dots-vertical</v-icon>
           </template>
 
-          <v-card>
+          <v-card class="rounded-lg">
             <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button">
               Edit user
             </v-btn>
