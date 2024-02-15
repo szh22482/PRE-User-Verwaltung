@@ -6,7 +6,7 @@ import { createApp } from 'vue'
 
 import axios from 'axios';
 
-//use http for now 
+//use http for now
 axios.defaults.baseURL = process.env.NODE_ENV == 'production' ? "/api" : "http://localhost:8080/api/";
 
 // Plugins
