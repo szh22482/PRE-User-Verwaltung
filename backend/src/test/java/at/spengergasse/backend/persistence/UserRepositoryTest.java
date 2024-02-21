@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -55,10 +56,11 @@ class UserRepositoryTest {
                 .created(LocalDate.now())
                 .build();
         // Suche den Benutzer nach der E-Mail-Adresse
-        User retrievedUser = userRepository.findByEmail("alice.doe@example.com");
+        Optional<User> optionalRetrievedUser = userRepository.findByEmail("alice.doe@example.com");
 
         // Überprüfe, ob der gespeicherte Benutzer korrekt abgerufen wurde
-        assertThat(retrievedUser).isNotNull();
+        assertThat(optionalRetrievedUser).isPresent();
+        User retrievedUser = optionalRetrievedUser.get();
         assertThat(retrievedUser.getFirstname().equals("Alice"));
         assertThat(retrievedUser.getLastname().equals("Doe"));
     }

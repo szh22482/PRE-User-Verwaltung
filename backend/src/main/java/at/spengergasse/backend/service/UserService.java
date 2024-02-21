@@ -1,7 +1,11 @@
 package at.spengergasse.backend.service;
 
 import at.spengergasse.backend.dto.UserDto;
+import at.spengergasse.backend.model.ERoles;
 import at.spengergasse.backend.model.User;
+import at.spengergasse.backend.model.UserToRoles;
+import at.spengergasse.backend.model.UserToRolesId;
+import at.spengergasse.backend.persistence.RoleRepository;
 import at.spengergasse.backend.persistence.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +14,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Service
 @Transactional
 public class UserService {
+
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public List<UserDto> fetchAllUsers() {
         return userRepository.findAll()
@@ -27,26 +35,25 @@ public class UserService {
                 .toList();
     }
 
-    public ResponseEntity<?> loginUser(String email, String password) {
+    public ResponseEntity<String> loginUser(String email, String password) {
+        //Check if user exists in database
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        //validate user input
-        if (email == null || password == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email and password are required.");
+        if(optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Login, Email wrong");
         }
 
-        //check if user exists
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid email or password.");
+        //Get actual user from optional
+        User user = optionalUser.get();
+
+        if(!checkPassword(user, password)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Login, Password wrong");
         }
 
-        User user = userOptional.get();
+        return ResponseEntity.status(HttpStatus.OK).body("Login Successful!");
+    }
 
-        //TODO: hash password and compare with hashed password in database
-        if (!password.equals(user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
-        }
-        return ResponseEntity.ok("Login successful");
+    private boolean checkPassword(User user, String password) {
+        return user.getPassword().equals(password);
     }
 }

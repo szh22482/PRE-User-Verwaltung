@@ -35,7 +35,7 @@
             },
             generateRandomColor() {
                 //use the color used by the user if it is set otherwise generate a random color
-                const randomIndex = this.colorNr ? this.colorNr : Math.floor(Math.random() * 10);
+                const randomIndex = this.colorNr != null ? this.colorNr : Math.floor(Math.random() * 10);
                 const randomColor = this.colors[randomIndex];
                 return {
                     background: randomColor.bg,
@@ -48,15 +48,13 @@
 
 <style>
     .profile-picture {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: #512DA8;
-        font-size: 15px;
-        color: blue;
+        font-size: 12px;
         text-align: center;
-        line-height: 50px;
-        margin: 20px 0;
+        line-height: 40px;
+        margin: 10px 10px 10px 0;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     }
 </style>
