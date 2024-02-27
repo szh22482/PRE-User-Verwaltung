@@ -5,7 +5,7 @@
             <v-card-subtitle class="ps-0">sign in</v-card-subtitle>
             <v-card-subtitle class="ps-0 mb-5">to continue</v-card-subtitle>
 
-            <v-form @submit.prevent="login">
+            <v-form @submit.prevent="login" @keyup.enter="login">
                 <v-text-body>Email address</v-text-body>
                 <v-text-field class="mt-2" v-model="email" variant="outlined" :rules="[rules.required, rules.email]"
                 ></v-text-field>

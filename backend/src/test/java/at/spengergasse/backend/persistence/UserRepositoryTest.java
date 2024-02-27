@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -40,7 +42,6 @@ class UserRepositoryTest {
         assertThat(retrievedUser.getLastname().equals("Mustermann"));
         assertThat(retrievedUser.getEmail().equals("max.mustermann@example.com"));
         assertThat(retrievedUser.getDeleted().equals(false));
-        userRepository.delete(user);
     }
 
     @Test
@@ -54,15 +55,13 @@ class UserRepositoryTest {
                 .deleted(false)
                 .created(LocalDate.now())
                 .build();
-        userRepository.save(user);
-
         // Suche den Benutzer nach der E-Mail-Adresse
-        Optional<User> retrievedUser = userRepository.findByEmail("alice.doe@example.com");
+        Optional<User> optionalRetrievedUser = userRepository.findByEmail("alice.doe@example.com");
 
         // Überprüfe, ob der gespeicherte Benutzer korrekt abgerufen wurde
-        assertThat(retrievedUser).isNotNull();
-        assertThat(retrievedUser.get().getFirstname().equals("Alice"));
-        assertThat(retrievedUser.get().getLastname().equals("Doe"));
-        userRepository.delete(user);
+        assertThat(optionalRetrievedUser).isPresent();
+        User retrievedUser = optionalRetrievedUser.get();
+        assertThat(retrievedUser.getFirstname().equals("Alice"));
+        assertThat(retrievedUser.getLastname().equals("Doe"));
     }
 }
