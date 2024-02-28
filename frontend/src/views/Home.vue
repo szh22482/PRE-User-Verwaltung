@@ -193,6 +193,18 @@
 
       <template v-slot:bottom> </template> <!-- removes the default footer -->
     </v-data-table>
+
+    <div class="add-user-button">
+      <v-btn
+        fab
+        dark
+        color="black"
+        icon="mdi-plus"
+        size="large"
+        @click="$router.push('/add')"
+      >
+      </v-btn>
+    </div>
   </v-container>
 </template>
 
@@ -307,5 +319,11 @@ export default {
   .edit-button {
     display: flex;
     justify-content: start !important;
+  }
+
+  .add-user-button {
+    position: fixed;
+    bottom: 35px;
+    right: 25px;
   }
 </style>
