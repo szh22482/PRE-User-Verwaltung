@@ -1,209 +1,202 @@
 <template>
-  <v-layout class="layout">
-    <NavBar/>
-    <v-main class="d-flex justify-start flex-column ps-5 main-content"
-    :style="{ 'margin-left': marginWidth }">
+  <v-card-title class="ps-4 pb-0 mb-0">USERS</v-card-title>
+  <v-card-subtitle class="ps-4 pt-0 mt-0">view and manage users</v-card-subtitle>
 
-      <v-card-title class="ps-4 pb-0 mb-0">USERS</v-card-title>
-      <v-card-subtitle class="ps-4 pt-0 mt-0">view and manage users</v-card-subtitle>
+  <v-container fluid>
+    <!-- :style="{ 'border': 'solid 1px #e0e0e0' }" -->
+    <v-data-table 
+      class="rounded-lg"
+      :items="users"
+      :headers="dynamicHeaders"
+    >
+      <template v-slot:headers>
+        <tr :style="{ 'backgroung-color': '#f9fafc' }">
+          <th>User</th>
+          <th v-if="!isSmallScreen">Created</th>
+          <th v-if="!colapseRole">Roles</th>
+          <th></th>
+        </tr>
+      </template>
 
-      <v-container fluid>
-        <!-- :style="{ 'border': 'solid 1px #e0e0e0' }" -->
-        <v-data-table 
-          class="rounded-lg"
-          :items="users"
-          :headers="dynamicHeaders"
-        >
-          <template v-slot:headers>
-            <tr :style="{ 'backgroung-color': '#f9fafc' }">
-              <th>User</th>
-              <th v-if="!isSmallScreen">Created</th>
-              <th v-if="!colapseRole">Roles</th>
-              <th></th>
-            </tr>
+      <template v-slot:item.fullname="{ item }">
+        <v-dialog>
+          <template v-slot:activator="{ props }">
+            <div class="align-horizonally" v-bind="props">
+              <profile-picture
+                :firstname="item.firstname"
+                :lastname="item.lastname"
+                :colorNr="item.colorNumber"
+              />
+              <div>
+                <span class="username collapsible-text">
+                  {{ item.firstname }} {{ item.lastname }}
+                </span>
+                <span class="collapsible-text email">
+                  {{ item.email }}
+                </span>
+              </div>
+            </div>
           </template>
 
-          <template v-slot:item.fullname="{ item }">
-            <v-dialog>
-              <template v-slot:activator="{ props }">
-                <div class="align-horizonally" v-bind="props">
-                  <profile-picture
-                    :firstname="item.firstname"
-                    :lastname="item.lastname"
-                    :colorNr="item.colorNumber"
-                  />
-                  <div>
-                    <span class="username collapsible-text">
-                      {{ item.firstname }} {{ item.lastname }}
-                    </span>
-                    <span class="collapsible-text email">
-                      {{ item.email }}
-                    </span>
-                  </div>
-                </div>
-              </template>
-
-              <template v-slot:default="{ isActive }">
-                <v-container class="d-flex justify-center align-center">
-                  <v-card width="800" class="rounded-lg">
-                    <v-card-text>
-                      <v-row justify="space-between pt-1">
-                        <v-col cols="7">
-                          <span 
-                            class="username text-truncate" 
-                            :style="{ 'padding-left': '20px' }">
-                            {{ item.firstname }} {{ item.lastname }}
-                          </span>
-                        </v-col>
-
-                        <v-col class="text-right" cols="5">
-                          <v-icon color="grey-darken-4">
-                            mdi-pencil
-                          </v-icon>
-                          <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">
-                            mdi-delete
-                          </v-icon>
-                        </v-col>
-                      </v-row>
-
-                      <v-divider class="my-4"></v-divider>
-
-                      <v-row>
-                          <v-col class="user-label">Firstname</v-col>
-                          <v-col class="user-info"> {{ item.firstname }} </v-col>
-                      </v-row>
-                      <v-row>
-                          <v-col class="user-label">Lastname </v-col>
-                          <v-col class="user-info"> {{ item.lastname }} </v-col>
-                      </v-row>
-                      <v-row>
-                          <v-col class="user-label">Email </v-col>
-                          <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
-                      </v-row>
-                      <v-row>
-                          <v-col class="user-label">Created </v-col>
-                          <v-col class="user-info"> 
-                            {{ new Date(item.created).toLocaleDateString("de-DE") }}
-                          </v-col>
-                      </v-row>
-                      <v-row>
-                          <v-col class="user-label">Password </v-col>
-                          <v-col class="user-info"> {{ item.password }} </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col class="user-label"> Roles </v-col>
-                          <v-col>
-                            <v-chip 
-                            class="role" 
-                            v-for="(role, index) in item.roles" 
-                            :key="index"
-                            :style="roleStyle(role)"
-                            >
-                              {{ role }}
-                            </v-chip>
-                          </v-col>
-                      </v-row>
-                    </v-card-text>
-
-                  <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                          text="Close"
-                          @click="isActive.value = false"
-                        ></v-btn>
-                      </v-card-actions>
-                  </v-card>
-              </v-container>
-              </template>
-            </v-dialog>
-          </template>
-
-          <template v-slot:item.created="{ item }">
-            {{ new Date(item.created).toLocaleDateString("de-DE") }}
-          </template>
-
-          <template v-slot:item.roles="{ item }">
-              <v-dialog>
-                <template v-slot:activator="{ props }">
-                  <div v-if="!colapseDate && item.roles && item.roles.length > 0">
-                    <v-chip 
-                      class="role" 
-                      v-for="(role, index) in item.roles" 
-                      :key="index"
-                      :style="roleStyle(role)">
-                        {{ role }}
-                    </v-chip>
-                  </div>
-                  <div v-else>
-                    <v-chip
-                      class="role"
-                      :style="roleStyle(item.roles[0])"
-                      v-bind="props"
-                      v-if="!colapseRole"
-                    >
-                    {{ item.roles[0] }}&nbsp;
-                    <span v-if="item.roles.length > 1">(+{{ item.roles.length - 1 }})</span>
-                    </v-chip>
-                  </div>
-                </template>
-
-                <template v-slot:default="{ isActive }">
-                  <v-card class="rounded-lg">
-                    <v-card-text>
-                      <span class="username">
-                        {{ item.firstname }} {{ item.lastname }} <br>
+          <template v-slot:default="{ isActive }">
+            <v-container class="d-flex justify-center align-center">
+              <v-card width="800" class="rounded-lg">
+                <v-card-text>
+                  <v-row justify="space-between pt-1">
+                    <v-col cols="7">
+                      <span 
+                        class="username text-truncate" 
+                        :style="{ 'padding-left': '20px' }">
+                        {{ item.firstname }} {{ item.lastname }}
                       </span>
-                      <span class="email">
-                        {{ item.email }}
-                      </span>
+                    </v-col>
 
-                      <v-divider class="my-4"></v-divider>
+                    <v-col class="text-right" cols="5">
+                      <v-icon color="grey-darken-4">
+                        mdi-pencil
+                      </v-icon>
+                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">
+                        mdi-delete
+                      </v-icon>
+                    </v-col>
+                  </v-row>
 
-                      <v-chip 
-                      class="role" 
-                      v-for="(role, index) in item.roles" 
-                      :key="index"
-                      :style="roleStyle(role)"
-                      >
-                        {{ role }}
-                      </v-chip>
-                    </v-card-text>
+                  <v-divider class="my-4"></v-divider>
 
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text="Close"
-                        @click="isActive.value = false"
-                      ></v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </template>
-              </v-dialog> 
-          </template>
+                  <v-row>
+                      <v-col class="user-label">Firstname</v-col>
+                      <v-col class="user-info"> {{ item.firstname }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Lastname </v-col>
+                      <v-col class="user-info"> {{ item.lastname }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Email </v-col>
+                      <v-col class="user-info text-truncate"> {{ item.email }} </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Created </v-col>
+                      <v-col class="user-info"> 
+                        {{ new Date(item.created).toLocaleDateString("de-DE") }}
+                      </v-col>
+                  </v-row>
+                  <v-row>
+                      <v-col class="user-label">Password </v-col>
+                      <v-col class="user-info"> {{ item.password }} </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="user-label"> Roles </v-col>
+                      <v-col>
+                        <v-chip 
+                        class="role" 
+                        v-for="(role, index) in item.roles" 
+                        :key="index"
+                        :style="roleStyle(role)"
+                        >
+                          {{ role }}
+                        </v-chip>
+                      </v-col>
+                  </v-row>
+                </v-card-text>
 
-          <template v-slot:item.actions="{ item }">
-            <v-menu location="start">
-              <template v-slot:activator="{ props }">
-                <v-icon v-bind="props">mdi-dots-vertical</v-icon>
-              </template>
-
-              <v-card class="rounded-lg">
-                <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button">
-                  Edit user
-                </v-btn>
-                <v-divider></v-divider>
-                  <v-btn variant="text" prepend-icon="mdi-delete" block>
-                    Delete user
-                  </v-btn>
+              <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      text="Close"
+                      @click="isActive.value = false"
+                    ></v-btn>
+                  </v-card-actions>
               </v-card>
-            </v-menu>
+          </v-container>
+          </template>
+        </v-dialog>
+      </template>
+
+      <template v-slot:item.created="{ item }">
+        {{ new Date(item.created).toLocaleDateString("de-DE") }}
+      </template>
+
+      <template v-slot:item.roles="{ item }">
+          <v-dialog>
+            <template v-slot:activator="{ props }">
+              <div v-if="!colapseDate && item.roles && item.roles.length > 0">
+                <v-chip 
+                  class="role" 
+                  v-for="(role, index) in item.roles" 
+                  :key="index"
+                  :style="roleStyle(role)">
+                    {{ role }}
+                </v-chip>
+              </div>
+              <div v-else>
+                <v-chip
+                  class="role"
+                  :style="roleStyle(item.roles[0])"
+                  v-bind="props"
+                  v-if="!colapseRole"
+                >
+                {{ item.roles[0] }}&nbsp;
+                <span v-if="item.roles.length > 1">(+{{ item.roles.length - 1 }})</span>
+                </v-chip>
+              </div>
+            </template>
+
+            <template v-slot:default="{ isActive }">
+              <v-card class="rounded-lg">
+                <v-card-text>
+                  <span class="username">
+                    {{ item.firstname }} {{ item.lastname }} <br>
+                  </span>
+                  <span class="email">
+                    {{ item.email }}
+                  </span>
+
+                  <v-divider class="my-4"></v-divider>
+
+                  <v-chip 
+                  class="role" 
+                  v-for="(role, index) in item.roles" 
+                  :key="index"
+                  :style="roleStyle(role)"
+                  >
+                    {{ role }}
+                  </v-chip>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text="Close"
+                    @click="isActive.value = false"
+                  ></v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog> 
+      </template>
+
+      <template v-slot:item.actions="{ item }">
+        <v-menu location="start">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props">mdi-dots-vertical</v-icon>
           </template>
 
-          <template v-slot:bottom> </template> <!-- removes the default footer -->
-        </v-data-table>
-      </v-container>
-    </v-main>
-  </v-layout>
+          <v-card class="rounded-lg">
+            <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button">
+              Edit user
+            </v-btn>
+            <v-divider></v-divider>
+              <v-btn variant="text" prepend-icon="mdi-delete" block>
+                Delete user
+              </v-btn>
+          </v-card>
+        </v-menu>
+      </template>
+      
+      <template v-slot:bottom> </template> <!-- removes the default footer -->
+    </v-data-table>
+  </v-container>
 </template>
 
 <script>
@@ -218,9 +211,6 @@ export default {
   },
   data() {
     return {
-      drawer: true,
-      isSmallScreen: false,
-      marginWidth: '200px',
       isSmallScreen: false,
       colapseDate: false,
       colapseRole: false,
@@ -249,7 +239,6 @@ export default {
   async mounted() {
     this.checkScreenSize();
     window.addEventListener('resize', this.checkScreenSize)
-    if(this.isSmallScreen) this.drawer = false;
     try {
       const response = await axios.get("/users/all");
       if(response != null) {
@@ -267,14 +256,10 @@ export default {
     window.removeEventListener('resize', this.checkScreenSize);
   },
   methods: {
-    toggleDrawer() {
-      this.drawer = !this.drawer;
-    },
     checkScreenSize() {
       this.isSmallScreen = window.innerWidth < 1280;
       this.colapseDate = window.innerWidth < 750;
       this.colapseRole = window.innerWidth < 560;
-      this.marginWidth = this.isSmallScreen ? '0px' : '140px';
     },
     roleStyle(role) {
       const defaultStyle = { background: '#eeeeee', color: '#000000' };
@@ -284,16 +269,7 @@ export default {
 }
 </script>
 
-<style>
-  .layout {
-    display: flex !important;
-    flex-direction: row;
-  }
-
-  .main-content {
-    flex-grow: 1;
-  }
-
+<style scoped>
   .role {
     margin-right: 5px;
     margin-block: 5px;
