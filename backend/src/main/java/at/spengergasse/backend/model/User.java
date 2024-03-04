@@ -36,7 +36,7 @@ public class User {
     private LocalDate created;
     private LocalDate deletedDate;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<UserToRoles> roles;
 
     public List<String> getRoles() {

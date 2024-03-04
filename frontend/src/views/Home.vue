@@ -2,7 +2,6 @@
   <v-container fluid class="ma-1">
     <v-data-table
       class="rounded-lg"
-      :style="{ 'border': 'solid 1px #e0e0e0' }"
       :items="users"
       :headers="dynamicHeaders"
     >
@@ -15,7 +14,7 @@
         </tr>
       </template>
 
-      <template v-slot:item.fullname="{ item }">
+      <template v-slot:item.fullname="{ item, index }">
         <v-dialog>
           <template v-slot:activator="{ props }">
             <div class="align-horizonally" v-bind="props">
@@ -39,7 +38,7 @@
             <v-container class="d-flex justify-center align-center">
               <v-card width="800" class="rounded-lg">
                 <v-card-text>
-                  <v-row justify="space-between pt-1">
+                  <v-row justify="space-between" pt="1">
                     <v-col cols="7">
                       <span
                         class="username text-truncate"
@@ -49,12 +48,15 @@
                     </v-col>
 
                     <v-col class="text-right" cols="5">
-                      <v-icon color="grey-darken-4">
+                      <v-icon color="grey-darken-4" @click="openInnerDialog(index)">
                         mdi-pencil
                       </v-icon>
                       <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">
                         mdi-delete
                       </v-icon>
+                      <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
+                        <EditDialog :item="item" :index="index" @cancel="cancelEdit(index)"/>
+                      </v-dialog>
                     </v-col>
                   </v-row>
 
@@ -173,129 +175,59 @@
         </v-dialog>
       </template>
 
-      <template v-slot:item.actions="{ item }">
-        <v-menu location="start">
-          <template v-slot:activator="{ props }">
-            <v-icon v-bind="props">mdi-dots-vertical</v-icon>
+      <template v-slot:item.actions="{ item, index }">
+              <v-menu
+                    v-model="dialogs[index].showOuterDialog"
+                    :close-on-content-click="false"
+                    location="end"
+                  >
+                    <template v-slot:activator="{ props} ">
+                      <button 
+                        class="btn-more" 
+                        @click="openOutderDialog(index)" 
+                        v-bind="props">
+                        <v-icon v-bind="props">mdi-dots-vertical</v-icon>
+                      </button>
+                    </template>
 
-            <v-dialog v-model="editDialog" max-width="700px">
-              <v-card>
-                <v-card-title>Edit User</v-card-title>
-                <v-card-text>
-                  <v-text-field v-model="item.firstname" label="Firstname" :counter="50" required variant="outlined"/>
-                  <v-text-field v-model="item.lastname" label="Lastname" :counter="100" required variant="outlined"/>
-                  <v-text-field v-model="item.email" label="Email" :counter="150" required variant="outlined"/>
-                  <v-select v-model="item.roles.role_name" :item="item.roles" item-text="role_name"
-                            item-value="id" label="Role" variant="outlined" required/>
-                  <v-text-field v-model="item.password" label="Password" :counter="150" required variant="outlined"/>
-                </v-card-text>
-                <v-card-actions>
-                  <div class="d-flex w-100">
-                    <v-btn color="red" @click="cancelEdit" variant="tonal">Cancel</v-btn>
-                    <v-btn color="green" @click="saveEditedUser(item)" variant="tonal" class="flex-grow-1">Save</v-btn>
-                  </div>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog
-              v-model="createDialog"
-              width="700px"
-            >
-              <v-card>
-                <v-card-title>Create a new User</v-card-title>
-                <v-card-text>
-                  <v-text-field v-model="editedUser.firstname" :rules="nameRules"
-                                :counter="15" label="Firstname" required variant="outlined"/>
-                  <v-text-field v-model="editedUser.lastname" :rules="nameRules"
-                                :counter="150" label="Lastname" required variant="outlined"/>
-                  <v-text-field v-model="editedUser.email" :rules="mailRules"
-                                :counter="150" label="Email" required variant="outlined"/>
-                  <v-select v-model="editedUser.roles" :items="user.roles" item-title="author_name" item-value="id" label="Role"
-                            variant="outlined"
-                            required/>
-                  <v-text-field v-model="editedUser.password" :rules="passwordRules"
-                                :counter="150" label="Password" required variant="outlined"/>
-                </v-card-text>
-
-                <v-card-actions>
-                  <div class="d-flex w-100">
-                    <v-btn color="red" variant="tonal" @click="$emit('cancel', null)">Cancel</v-btn>
-                    <v-btn color="green" variant="tonal" @click="createUser" class="flex-grow-1">Create</v-btn>
-                  </div>
-                </v-card-actions>
-              </v-card>
-              <User @cancel="createDialog = false"/>
-            </v-dialog>
-          </template>
-
-          <v-card class="rounded-lg">
-            <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button" @click="editDialog = !editDialog">
-              Edit user
-            </v-btn>
-            <v-divider></v-divider>
-            <v-btn variant="text" prepend-icon="mdi-delete" block>
-              Delete user
-            </v-btn>
-          </v-card>
-
-        </v-menu>
-      </template>
+                    <v-card class="rounded-lg">
+                      <v-btn variant="text" prepend-icon="mdi-pencil" block class="edit-button" @click="openInnerDialog(index)">
+                        Edit user
+                      </v-btn>
+                      <v-divider></v-divider>
+                      <v-btn variant="text" prepend-icon="mdi-delete" block>
+                        Delete user
+                      </v-btn>
+                    </v-card>
+                  </v-menu>
+                  <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
+                    <EditDialog :item="item" :index="index" @cancel="cancelEdit(index)"/>
+                  </v-dialog>
+            </template>
 
       <template v-slot:bottom>
       </template> <!-- removes the default footer -->
     </v-data-table>
-    <v-btn variant="tonal" color="green" icon="mdi-plus" size="small" class="create-button" @click="createDialog = !createDialog"></v-btn>
-
   </v-container>
-
-  <v-snackbar
-    v-model="snackbar.show"
-    :timeout="1800"
-  >
-    {{ snackbar.message }}
-
-    <template v-slot:actions>
-      <v-btn
-        color="green"
-        variant="text"
-        @click="snackbar.show = false"
-      >
-        Close
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
 
 <script>
 import axios from "axios";
 import ProfilePicture from "@/components/ProfilePicture.vue";
+import EditDialog from "@/components/EditDialog.vue";
 
 export default {
   components: {
-    ProfilePicture
+    ProfilePicture,
+    EditDialog
   },
   data() {
     return {
       isSmallScreen: false,
       colapseDate: false,
       colapseRole: false,
+      dialogs: [],
       users: [],
-      snackbar: {
-        show: false,
-        message: ''
-      },
-      createDialog: false,
-      editDialog: false,
-      deleteDialog: false,
-      editedUser: {
-        firstname: '',
-        lastname: '',
-        email: '',
-        roles: undefined,
-        password: null
-      },
-      //showCreateUser: false,
       roleColors: {
         Administrator: {background: '#e2ecf7', color: '#1c6ac1'},
         Auditor: {background: '#e8f5e9', color: '#5fb762'},
@@ -325,6 +257,7 @@ export default {
       if (response != null) {
         this.users = response.data;
         console.log(this.users)
+        this.dialogs = this.users.map(() => ({ showOuterDialog: false, showInnerDialog: false }));
       } else {
         alert("No data found");
       }
@@ -336,6 +269,16 @@ export default {
     window.removeEventListener('resize', this.checkScreenSize);
   },
   methods: {
+    openOutderDialog(index) {
+      this.dialogs[index].showOuterDialog = true;
+    },
+    openInnerDialog(index) {
+      this.dialogs[index].showOuterDialog = false;
+      this.dialogs[index].showInnerDialog = true;
+    },
+    closeInnerDialog(index) {
+      this.dialogs[index].showInnerDialog = false;
+    },
     checkScreenSize() {
       this.isSmallScreen = window.innerWidth < 960;
       this.colapseDate = window.innerWidth < 750;
@@ -346,40 +289,8 @@ export default {
       const defaultStyle = {background: '#eeeeee', color: '#000000'};
       return this.roleColors[role] || defaultStyle;
     },
-    saveEditedUser(item) {
-      console.log(item)
-      axios.patch(`/users/${item.id}`, {
-        firstname: this.firstname,
-        lastname: this.editedUser.lastname,
-        email: this.editedUser.email,
-        roles: this.editedUser.roles,
-        password: this.editedUser.password,
-      })
-        .then(response => {
-          // Update the user in the users array
-          const index = this.users.findIndex(user => user.id === this.id); // this.editedUser.id
-          if (index !== -1) {
-            this.users.splice(index, 1, response.data);
-          }
-          this.editDialog = false;
-          console.log('User edited:', response.data);
-
-          this.snackbar.message = 'Successfully edited User';
-          this.snackbar.show = true;
-          this.user_sel = null;
-        })
-        .catch(error => {
-          console.error('Error editing User:', error);
-        });
-    },
-    cancelEdit() { // not sure
-      this.editDialog = false;
-      // Reset
-      this.editedUser.firstname = '';
-      this.editedUser.lastname = null;
-      this.editedUser.email = null;
-      this.editedUser.role = '';
-      this.editedUser.password = null;
+    cancelEdit(index) {
+      this.dialogs[index].showInnerDialog = false;
     }
   },
 }

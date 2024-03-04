@@ -17,6 +17,6 @@ public class Role extends AbstractPersistable<Long> {
     @Enumerated(EnumType.STRING)
     private ERoles roleName;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<UserToRoles> userList;
 }

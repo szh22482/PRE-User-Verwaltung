@@ -34,14 +34,14 @@ class UserRepositoryTest {
         userRepository.save(user);
 
         // Suche den Benutzer nach der ID
-        User retrievedUser = userRepository.findById(user.getId());
+        Optional<User> retrievedUser = userRepository.findById(user.getId());
 
         // Überprüfe, ob der gespeicherte Benutzer korrekt abgerufen wurde
         assertThat(retrievedUser).isNotNull();
-        assertThat(retrievedUser.getFirstname().equals("Max"));
-        assertThat(retrievedUser.getLastname().equals("Mustermann"));
-        assertThat(retrievedUser.getEmail().equals("max.mustermann@example.com"));
-        assertThat(retrievedUser.getDeleted().equals(false));
+        assertThat(retrievedUser.get().getFirstname().equals("Max"));
+        assertThat(retrievedUser.get().getLastname().equals("Mustermann"));
+        assertThat(retrievedUser.get().getEmail().equals("max.mustermann@example.com"));
+        assertThat(retrievedUser.get().getDeleted().equals(false));
     }
 
     @Test
