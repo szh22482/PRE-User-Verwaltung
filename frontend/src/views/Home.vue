@@ -1,5 +1,9 @@
 <template>
-  <v-container fluid class="ma-1">
+  <v-card-title class="ps-4 pb-0 mb-0">USERS</v-card-title>
+  <v-card-subtitle class="ps-4 pt-0 mt-0">view and manage users</v-card-subtitle>
+
+  <v-container fluid>
+    <!-- :style="{ 'border': 'solid 1px #e0e0e0' }" -->
     <v-data-table
       class="rounded-lg"
       :items="users"
@@ -182,9 +186,9 @@
                     location="end"
                   >
                     <template v-slot:activator="{ props} ">
-                      <button 
-                        class="btn-more" 
-                        @click="openOutderDialog(index)" 
+                      <button
+                        class="btn-more"
+                        @click="openOutderDialog(index)"
                         v-bind="props">
                         <v-icon v-bind="props">mdi-dots-vertical</v-icon>
                       </button>
@@ -213,13 +217,15 @@
 
 <script>
 import axios from "axios";
+import NavBar from "@/components/NavBar.vue";
 import ProfilePicture from "@/components/ProfilePicture.vue";
 import EditDialog from "@/components/EditDialog.vue";
 
 export default {
   components: {
     ProfilePicture,
-    EditDialog
+    EditDialog,
+    NavBar
   },
   data() {
     return {
@@ -346,4 +352,14 @@ export default {
   top: 300px;
   left: 100px;
 }
+  .edit-button {
+    display: flex;
+    justify-content: start !important;
+  }
+
+  @media only screen and (max-width: 1280px) {
+    .layout {
+      flex-direction: column;
+    }
+  }
 </style>
