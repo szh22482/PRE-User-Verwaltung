@@ -103,6 +103,10 @@
                 type: Number,
                 required: true
             },
+            email: {
+                type: String,
+                required: true
+            },
         },
         mounted() {
             this.user = { ...this.item };
@@ -124,38 +128,42 @@
             async saveEditedUser() {
                 const user = this.user;
                 const rules = this.rules;
-                if (this.validateField(user.firstname, [rules.required, rules.counter]) !== true ||
-                this.validateField(user.lastname, [rules.required, rules.counter]) !== true ||
-                this.validateField(user.email, [rules.required, rules.email]) !== true ||
-                this.validateField(user.password, [rules.required, rules.counter]) !== true ||
-                this.validateField(this.selectedRoles, [rules.required, rules.roles]) !== true) {
-                    return;
+                
+                const fieldsToValidate = [
+                    { field: user.firstname, validators: [rules.required, rules.counter] },
+                    { field: user.lastname, validators: [rules.required, rules.counter] },
+                    { field: user.email, validators: [rules.required, rules.email] },
+                    { field: user.password, validators: [rules.required, rules.counter] },
+                    { field: this.selectedRoles, validators: [rules.required, rules.roles] }
+                ];
+
+                for (const fieldToValidate of fieldsToValidate) {
+                    if (this.validateField(fieldToValidate.field, fieldToValidate.validators) !== true) {
+                        return; // Exit early if validation fails for any field
+                    }
                 }
 
                 const selectedRoleIds = this.selectedRoles.map(selectedRole => {
                     const matchingRole = this.roles.find(role => role.title === selectedRole);
                     return matchingRole ? matchingRole.id : null;
                 }).filter(id => id !== null);
-                
+
                 user.roles = selectedRoleIds;
-               
+
                 try {
-                    const response = await axios.put(`users/edit`, user);
-                    if(response.status === 200) {
+                    const response = await axios.put(`users/edit?email=${this.email}`, user);
+                    if (response.status === 200) {
                         this.item.firstname = user.firstname;
                         this.item.lastname = user.lastname;
                         this.item.email = user.email;
-                        console.log(this.selectedRoles)
                         this.item.roles = this.selectedRoles;
                         this.item.password = user.password;
                         this.$emit('cancel');
                     } else {
-                        console.log(response)
                         alert(response.data);
                     }
-                } catch(error) {
-                    console.log(error)
-                   alert(error);
+                } catch (error) {
+                    alert(error.response.data);
                 }
             },
             cancelEdit() {

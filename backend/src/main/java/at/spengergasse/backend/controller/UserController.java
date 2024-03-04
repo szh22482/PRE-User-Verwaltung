@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<?> editUser(@RequestBody UserDto userDto) {
-        return userService.editUser(userDto);
+    public ResponseEntity<?> editUser(@RequestBody UserDto userDto, @RequestParam String email) {
+        return userService.editUser(userDto, email);
     }
 }

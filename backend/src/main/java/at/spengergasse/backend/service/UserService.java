@@ -52,17 +52,22 @@ public class UserService {
         return user.getPassword().equals(password);
     }
 
-    public ResponseEntity<?> editUser(UserDto userDto) {
+    public ResponseEntity<?> editUser(UserDto userDto, String email) {
         if (userDto == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User data is required.");
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(userDto.email());
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
 
         User user = userOptional.get();
+
+        if(!Objects.equals(userDto.email(), user.getEmail())
+                && userRepository.findByEmail(userDto.email()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists.");
+        }
 
         user.setFirstname(userDto.firstname());
         user.setLastname(userDto.lastname());
@@ -72,6 +77,22 @@ public class UserService {
         try {
             List<UserToRoles> findRoles = userToRolesRepository.findByUser(user);
             List<UserToRoles> roles = new ArrayList<>();
+
+            for(UserToRoles deleteRole: findRoles) {
+                boolean found = false;
+                for(String role: userDto.roles()) {
+                    if (Objects.equals(Long.parseLong(role), deleteRole.getRole().getId())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found) {
+                    userToRolesRepository.deleteById(deleteRole.getId());
+                    user.getRoles().remove(deleteRole);
+                    userRepository.save(user);
+                }
+            }
+
             for(String roleId: userDto.roles()) {
                 try {
                     Long roleIdLong = Long.parseLong(roleId);
@@ -86,20 +107,7 @@ public class UserService {
                     }
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("An error occurred while updating the user.");
-                }
-            }
-
-            for(UserToRoles deleteRole: findRoles) {
-                boolean found = false;
-                for(UserToRoles role: roles) {
-                    if (Objects.equals(role.getRole().getId(), deleteRole.getRole().getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if(!found) {
-                    userToRolesRepository.delete(deleteRole);
+                            .body("An error occurred while updating the user roles.");
                 }
             }
 

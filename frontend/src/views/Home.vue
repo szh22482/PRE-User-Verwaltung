@@ -3,7 +3,6 @@
   <v-card-subtitle class="ps-4 pt-0 mt-0">view and manage users</v-card-subtitle>
 
   <v-container fluid>
-    <!-- :style="{ 'border': 'solid 1px #e0e0e0' }" -->
     <v-data-table
       class="rounded-lg"
       :items="users"
@@ -21,7 +20,7 @@
       <template v-slot:item.fullname="{ item, index }">
         <v-dialog>
           <template v-slot:activator="{ props }">
-            <div class="align-horizonally" v-bind="props">
+            <div class="align-horizontally" v-bind="props">
               <profile-picture
                 :firstname="item.firstname"
                 :lastname="item.lastname"
@@ -59,7 +58,7 @@
                         mdi-delete
                       </v-icon>
                       <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
-                        <EditDialog :item="item" :index="index" @cancel="cancelEdit(index)"/>
+                        <EditDialog :item="item" :index="index" :email="item.email" @cancel="cancelEdit(index)"/>
                       </v-dialog>
                     </v-col>
                   </v-row>
@@ -205,7 +204,7 @@
                     </v-card>
                   </v-menu>
                   <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
-                    <EditDialog :item="item" :index="index" @cancel="cancelEdit(index)"/>
+                    <EditDialog :item="item" :index="index" :email="item.email" @cancel="cancelEdit(index)"/>
                   </v-dialog>
             </template>
 
@@ -308,7 +307,7 @@ export default {
   margin-block: 5px;
 }
 
-.align-horizonally {
+.align-horizontally {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -346,20 +345,4 @@ export default {
   display: flex;
   justify-content: start !important;
 }
-
-.create-button {
-  position: fixed;
-  top: 300px;
-  left: 100px;
-}
-  .edit-button {
-    display: flex;
-    justify-content: start !important;
-  }
-
-  @media only screen and (max-width: 1280px) {
-    .layout {
-      flex-direction: column;
-    }
-  }
 </style>

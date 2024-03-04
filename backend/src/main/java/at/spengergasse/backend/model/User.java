@@ -36,10 +36,10 @@ public class User {
     private LocalDate created;
     private LocalDate deletedDate;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserToRoles> roles;
 
-    public List<String> getRoles() {
+    public List<String> getRoleNames() {
         return roles.stream()
                 .map(r -> capitalizeFirstLetter(r.getRole().getRoleName().toString()))
                 .collect(Collectors.toList());
