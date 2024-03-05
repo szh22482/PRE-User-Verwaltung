@@ -60,4 +60,8 @@ public class User {
                 .role(Role.builder().roleName(ERoles.valueOf(role)).build()).build())
                 .collect(Collectors.toList());
     }
+
+    public void setRoles(List<UserToRoles> roles) {
+        this.roles = roles;
+    }
 }

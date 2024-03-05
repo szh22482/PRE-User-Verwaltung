@@ -54,12 +54,12 @@
                       <v-icon color="grey-darken-4" @click="openInnerDialog(index)">
                         mdi-pencil
                       </v-icon>
-                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }" 
+                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }"
                       @click="openDeleteDialog(index)">
                         mdi-delete
                       </v-icon>
                       <v-dialog width="300" v-model="dialogs[index].showDeleteDialog">
-                        <Confirmation :item="item" :index="index" 
+                        <Confirmation :item="item" :index="index"
                         @delete="deleteUser(index)" @cancel="cancelDelete(index)"/>
                       </v-dialog>
                       <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
@@ -220,6 +220,18 @@
       <template v-slot:bottom>
       </template> <!-- removes the default footer -->
     </v-data-table>
+
+    <div class="add-user-button">
+      <v-btn
+        fab
+        dark
+        color="black"
+        icon="mdi-plus"
+        size="large"
+        @click="$router.push('/add')"
+      >
+      </v-btn>
+    </div>
   </v-container>
 </template>
 
@@ -242,7 +254,6 @@ export default {
       isSmallScreen: false,
       colapseDate: false,
       colapseRole: false,
-      dialogs: [],
       users: [],
       roleColors: {
         Administrator: {background: '#e2ecf7', color: '#1c6ac1'},
@@ -322,7 +333,7 @@ export default {
       this.users.splice(index, 1);
       this.dialogs.splice(index, 1);
       this.closeDeleteDialog(index);
-    } 
+    }
   },
 }
 </script>
@@ -370,5 +381,11 @@ export default {
 .edit-button {
   display: flex;
   justify-content: start !important;
+}
+
+.add-user-button {
+  position: fixed;
+  bottom: 35px;
+  right: 25px;
 }
 </style>
