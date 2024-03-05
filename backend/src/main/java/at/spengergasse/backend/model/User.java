@@ -27,8 +27,8 @@ public class User {
     private String firstname;
     private String lastname;
     @Min(value = 0, message = "Number must be at least 0")
-    @Max(value = 9, message = "Number must be at most 9")
-    private int colorNumber; //number between 0 and 9
+    @Max(value = 6, message = "Number must be at most 6")
+    private int colorNumber; //number between 0 and 6
     @Column(unique = true)
     private String email;
     private String password;

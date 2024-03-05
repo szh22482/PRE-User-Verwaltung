@@ -13,7 +13,7 @@
 
       <div 
       v-if="isSmallScreen && drawer" 
-      :style="{'margin-right': '76px'}">
+      :style="{'margin-right': '48px'}">
       </div>
 
       <div :style="{ 'margin-right': marginWidth }">
