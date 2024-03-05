@@ -23,6 +23,7 @@
                 :rules="[rules.required, rules.roles]"
                 v-model="selectedRoles" multiple
                 :items="roles" variant="outlined" required
+                autocomplete="off"
                >
 
                 <template v-slot:selection="{item, index}">
@@ -44,6 +45,7 @@
                 :type="show ? 'text' : 'password'" :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append-inner="show = !show"
                 v-model="user.password" required variant="outlined"
+                autocomplete="off"
                 />
         </v-card-text>
 

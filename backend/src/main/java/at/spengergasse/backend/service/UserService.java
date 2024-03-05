@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -123,5 +124,19 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while updating the user.");
         }
+    }
+
+    public ResponseEntity<?> deleteUser(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        User user = userOptional.get();
+        user.setDeletedDate(LocalDate.now());
+        user.setDeleted(true);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User deleted successfully");
     }
 }

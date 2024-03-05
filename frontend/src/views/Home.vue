@@ -54,9 +54,14 @@
                       <v-icon color="grey-darken-4" @click="openInnerDialog(index)">
                         mdi-pencil
                       </v-icon>
-                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }">
+                      <v-icon color="red-lighten-1" :style="{ 'margin-inline': '10px' }" 
+                      @click="openDeleteDialog(index)">
                         mdi-delete
                       </v-icon>
+                      <v-dialog width="300" v-model="dialogs[index].showDeleteDialog">
+                        <Confirmation :item="item" :index="index" 
+                        @delete="deleteUser(index)" @cancel="cancelDelete(index)"/>
+                      </v-dialog>
                       <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
                         <EditDialog :item="item" :index="index" :email="item.email" @cancel="cancelEdit(index)"/>
                       </v-dialog>
@@ -198,11 +203,15 @@
                         Edit user
                       </v-btn>
                       <v-divider></v-divider>
-                      <v-btn variant="text" prepend-icon="mdi-delete" block>
+                      <v-btn variant="text" prepend-icon="mdi-delete" block @click="openDeleteDialog(index)">
                         Delete user
                       </v-btn>
                     </v-card>
                   </v-menu>
+                  <v-dialog width="300" v-model="dialogs[index].showDeleteDialog">
+                   <Confirmation :item="item" :index="index"
+                   @delete="deleteUser(index)" @cancel="cancelDelete(index)"/>
+                  </v-dialog>
                   <v-dialog width="700" v-model="dialogs[index].showInnerDialog">
                     <EditDialog :item="item" :index="index" :email="item.email" @cancel="cancelEdit(index)"/>
                   </v-dialog>
@@ -219,12 +228,14 @@ import axios from "axios";
 import NavBar from "@/components/NavBar.vue";
 import ProfilePicture from "@/components/ProfilePicture.vue";
 import EditDialog from "@/components/EditDialog.vue";
+import Confirmation from "@/components/Confirmation.vue";
 
 export default {
   components: {
     ProfilePicture,
     EditDialog,
-    NavBar
+    NavBar,
+    Confirmation
   },
   data() {
     return {
@@ -262,7 +273,7 @@ export default {
       if (response != null) {
         this.users = response.data;
         console.log(this.users)
-        this.dialogs = this.users.map(() => ({ showOuterDialog: false, showInnerDialog: false }));
+        this.dialogs = this.users.map(() => ({ showOuterDialog: false, showInnerDialog: false, showDeleteDialog: false}));
       } else {
         alert("No data found");
       }
@@ -281,6 +292,13 @@ export default {
       this.dialogs[index].showOuterDialog = false;
       this.dialogs[index].showInnerDialog = true;
     },
+    openDeleteDialog(index) {
+      this.dialogs[index].showOuterDialog = false;
+      this.dialogs[index].showDeleteDialog = true;
+    },
+    closeDeleteDialog(index) {
+      this.dialogs[index].showDeleteDialog = false;
+    },
     closeInnerDialog(index) {
       this.dialogs[index].showInnerDialog = false;
     },
@@ -296,7 +314,15 @@ export default {
     },
     cancelEdit(index) {
       this.dialogs[index].showInnerDialog = false;
-    }
+    },
+    cancelDelete(index) {
+      this.dialogs[index].showDeleteDialog = false;
+    },
+    deleteUser(index){
+      this.users.splice(index, 1);
+      this.dialogs.splice(index, 1);
+      this.closeDeleteDialog(index);
+    } 
   },
 }
 </script>

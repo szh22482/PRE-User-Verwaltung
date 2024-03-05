@@ -32,4 +32,9 @@ public class UserController {
     public ResponseEntity<?> editUser(@RequestBody UserDto userDto, @RequestParam String email) {
         return userService.editUser(userDto, email);
     }
+
+    @PutMapping("delete/{email}")
+    public @ResponseStatus ResponseEntity delete(@PathVariable final String email) {
+        return userService.deleteUser(email);
+    }
 }
