@@ -1,6 +1,6 @@
 <template>
     <div class="profile-picture" :style="generateRandomColor()">
-        <img :alt="generateInitials()">
+        {{ generateInitials() }}
     </div>
 </template>
 
