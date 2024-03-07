@@ -1,4 +1,5 @@
 <template>
+  <div v-if="showNavbar">
     <div v-if="isSmallScreen && drawer"
       :style="{'margin-bottom': '48px'}">
       </div>
@@ -65,24 +66,6 @@
             </router-link>
           </v-list-item>
 
-          <v-list-item class="nav-item">
-            <router-link class="router-link" v-bind:to="`/add`">
-              <v-hover>
-                <template v-slot:default="{ isHovering, props }">
-                  <v-btn 
-                  v-bind="props"
-                  prepend-icon="mdi-plus" 
-                  :ripple="false" 
-                  variant="text" 
-                  size="large"
-                  width="150"
-                  :style="{ 'border-left': isHovering ? 'solid 5px black' : 'none' }">
-                    <span class="font-weight-bold">ADD USER</span>
-                  </v-btn>
-                </template>
-              </v-hover>
-            </router-link>
-          </v-list-item>
           <v-list-item class="logout">
             <v-hover>
                 <template v-slot:default="{ isHovering, props }">
@@ -100,6 +83,7 @@
           </v-list-item>
       </v-navigation-drawer>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -115,6 +99,9 @@ import axios from 'axios';
               marginWidth: '70px',
               isAdmin: false,
           }
+      },
+      props: {
+        showNavbar: Boolean
       },
       async mounted() {
         this.checkScreenSize();

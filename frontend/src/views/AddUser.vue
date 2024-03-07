@@ -8,115 +8,128 @@
             <div class="subtitle">Create a new User</div>
             <v-form @submit-prevent="addUser">
                 <v-row>
-                    <v-col>
-                        <label for="">Firstname</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield" required
-                        :model-value="user.firstname" 
-                        :rules="[rules.required, rules.counter]"
-                        @update:model-value="newValue => user.firstname = newValue" inputType="text" />
-                    </v-col>
-                    <v-col>
-                        <label for="">Lastname</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield"
-                        :model-value="user.lastname" required
-                        :rules="[rules.required, rules.counter]"
-                        @update:model-value="newValue => user.lastname = newValue" inputType="text" />
-                    </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">Firstname</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield" required
+                    v-model="user.firstname"
+                    :rules="[rules.required, rules.counter]"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">Lastname</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield"
+                    v-model="user.lastname" required
+                    :rules="[rules.required, rules.counter]"
+                    />
+                </v-col>
                 </v-row>
 
                 <v-row>
-                    <v-col>
-                        <label for="">E-Mail-Address</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield" required
-                        :model-value="user.email" 
-                        :rules="[rules.required, rules.email]"
-                        @update:model-value="newValue => user.email = newValue" inputType="text" />
-                    </v-col>
-                    <v-col>
-                        <label for="">Phone-Number</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield" :model-value="user.phoneNumber" 
-                        @update:model-value="newValue => user.phoneNumber = newValue"></v-text-field>
-                    </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">E-Mail-Address</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield" required
+                    v-model="user.email"
+                    :rules="[rules.required, rules.email]"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">Phone-Number</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield"
+                    v-model="user.phoneNumber"
+                    />
+                </v-col>
                 </v-row>
 
                 <v-row>
-                    <v-col>
-                        <label for="">Roles</label>
-                        <v-select clearable class="mt-1" 
-                            v-model="selectedRoles" multiple
-                            :rules="[rules.required, rules.roles]"
-                            :items="roles" variant="outlined" required
-                        >
-
-                            <template v-slot:selection="{item, index}">
-                                <v-chip v-if="index < 2"  :style="roleStyle(item)">
-                                    <span>{{ item.title }}</span>
-                                </v-chip>
-                                <span 
-                                    v-if="index === 2"
-                                    class="text-grey text-caption align-self-center"
-                                >
-                                    (+{{ selectedRoles.length - 2 }} others)
-                                </span>
+                <v-col cols="12" sm="6">
+                    <label for="">Roles</label>
+                    <v-select 
+                    clearable
+                    class="mt-1" 
+                    v-model="selectedRoles" 
+                    multiple
+                    :items="roles" 
+                    variant="outlined" 
+                    required
+                    >
+                    <template v-slot:selection="{ item, index }">
+                        <v-chip v-if="index < 2" :style="roleStyle(item)">
+                        <span>{{ item.title }}</span>
+                        </v-chip>
+                        <span v-if="index === 2" class="text-grey text-caption align-self-center">
+                        (+{{ selectedRoles.length - 2 }} others)
+                        </span>
+                    </template>
+                    </v-select>
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <label>Date of Birth</label>
+                    <v-text-field 
+                    readonly
+                    variant="outlined"
+                    @click="openDatePicker" 
+                    @focus="openDatePicker" 
+                    v-model="formattedDate"
+                    /> 
+                    <v-dialog 
+                    class="date-picker" 
+                    v-model="showDatePicker" 
+                    persistent
+                    >
+                    <v-container>
+                        <v-row justify="space-around">
+                        <v-date-picker :max="maxDate" elevation="24" v-model="tempDate">
+                            <template v-slot:actions>
+                            <v-spacer></v-spacer>
+                            <v-btn text color="black" @click="closeDatePicker">Close</v-btn>
+                            <v-btn text color="black" @click="dateSelected">Save</v-btn>
                             </template>
-                        </v-select>
-                    </v-col>
-                    <v-col>
-                        <label>Date of Birth</label>
-                        <v-text-field readonly="true" variant="outlined" @click="openDatePicker" @focus="openDatePicker" v-model="formattedDate"/> 
-                        <v-dialog class="date-picker" v-model="showDatePicker" persistent>
-                            <v-container>
-                                <v-row justify="space-around">
-                                    <v-date-picker :max="maxDate" elevation="24" v-model="tempDate">
-                                        <template v-slot:actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn text color="black" @click="closeDatePicker">Close</v-btn>
-                                            <v-btn text color="black" @click="dateSelected">Save</v-btn>
-                                        </template>
-                                    </v-date-picker>
-                                </v-row>
-                            </v-container>
-                        </v-dialog>
-                    </v-col>
+                        </v-date-picker>
+                        </v-row>
+                    </v-container>
+                    </v-dialog>
+                </v-col>
                 </v-row>
+
                 <v-row>
-                    <v-col>
-                        <label for="">Password</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield" 
-                        required
-                        :model-value="user.password" 
-                        type="password"
-                        :rules="[rules.required, rules.counter]"
-                        @update:model-value="newValue => user.password = newValue" inputType="secure"/>
-                    </v-col>
-                    <v-col>
-                        <label for="">Confirm Password</label>
-                        <v-text-field 
-                        variant="outlined"
-                        class="inputfield"
-                        type="password"
-                        :model-value="confirmpassword" required
-                        :rules="[rules.required, rules.counter]"
-                        @update:model-value="newValue => confirmpassword = newValue" inputType="secure"/>
-                    </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">Password</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield" 
+                    required
+                    v-model="user.password" 
+                    type="password"
+                    :rules="[rules.required, rules.counter]"
+                    />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <label for="">Confirm Password</label>
+                    <v-text-field 
+                    variant="outlined"
+                    class="inputfield"
+                    type="password"
+                    v-model="confirmpassword" required
+                    :rules="[rules.required, rules.counter]"
+                    />
+                </v-col>
                 </v-row>
+
                 <div v-if="invalidInput" class="error-message">{{ invalidInput }}</div>
                 <v-row>
-                    <v-col>
-                        <div class="btn-div">
-                            <v-btn @click="addUser" class="submit-btn">confirm</v-btn>
-                        </div>
-                    </v-col>
+                <v-col>
+                    <div class="btn-div">
+                    <v-btn @click="addUser" class="submit-btn">confirm</v-btn>
+                    </div>
+                </v-col>
                 </v-row>
             </v-form>
         </div>
@@ -248,10 +261,7 @@
                     }
                 } catch (error) {
                     console.error(error);
-                }
-
-
-                    
+                }      
             },
             handleDateUpdate(newDate) {
                 this.dob = newDate;

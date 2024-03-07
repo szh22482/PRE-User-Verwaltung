@@ -1,11 +1,39 @@
 <template>
-  <v-card-title class="ps-4 pb-0 mb-0">USERS</v-card-title>
-  <v-card-subtitle class="ps-4 pt-0 mt-0">view and manage users</v-card-subtitle>
+  <v-container>
+    <v-row class="mb-4 mt-4" justify="space-between">
+      <v-col>
+        <v-text-field
+          v-model="search"
+          placeholder="Search"
+          prepend-inner-icon="mdi-magnify"
+          outlined
+          variant="outlined"
+          density="comfortable"
+          class="search-bar"
+        ></v-text-field>
+      </v-col>
+      <v-col xs="12" md="auto" class="d-flex justify-end">
+        <v-btn
+          variant="outlined"
+          append-icon="mdi-filter"
+          size="large"
+          class="setting-button"
+        >Filter</v-btn>
 
-  <v-container fluid>
+        <v-btn 
+          variant="outlined"
+          append-icon="mdi-plus"
+          size="large"
+          class="setting-button"
+          @click="$router.push('/add')"
+        >Add</v-btn>
+      </v-col>
+    </v-row>
+
     <v-data-table
       class="rounded-lg"
-      :items="users"
+      :items="filteredUsers"
+      :search="search"
       :headers="dynamicHeaders"
     >
       <template v-slot:headers>
@@ -220,18 +248,6 @@
       <template v-slot:bottom>
       </template> <!-- removes the default footer -->
     </v-data-table>
-
-    <div class="add-user-button">
-      <v-btn
-        fab
-        dark
-        color="black"
-        icon="mdi-plus"
-        size="large"
-        @click="$router.push('/add')"
-      >
-      </v-btn>
-    </div>
   </v-container>
 </template>
 
@@ -251,6 +267,7 @@ export default {
   },
   data() {
     return {
+      search: '',
       isSmallScreen: false,
       colapseDate: false,
       colapseRole: false,
@@ -269,13 +286,24 @@ export default {
   computed: {
     dynamicHeaders() {
       let headers = [
-        {text: 'User', value: 'fullname', sortable: true},
-        ...(!this.isSmallScreen ? [{text: 'Created', value: 'created', sortable: true}] : []),
-        ...(!this.colapseRole ? [{text: 'Roles', value: 'roles', sortable: false}] : []),
-        {text: '', value: 'actions', width: '30px', sortable: false},
+        {text: 'User', value: 'fullname'},
+        ...(!this.isSmallScreen ? [{text: 'Created', value: 'created'}] : []),
+        ...(!this.colapseRole ? [{text: 'Roles', value: 'roles'}] : []),
+        {text: '', value: 'actions', width: '30px'},
       ];
       return headers;
     },
+    filteredUsers() {
+      return this.users.filter(user => {
+        if (user.firstname == null || user.lastname == null || user.email == null) return false;
+        const fullName = (user.firstname + ' ' + user.lastname).toLowerCase();
+        const searchLowerCase = this.search.toLowerCase();
+        return fullName.startsWith(searchLowerCase) ||
+              user.firstname.toLowerCase().startsWith(searchLowerCase) ||
+              user.lastname.toLowerCase().startsWith(searchLowerCase) ||
+              user.email.toLowerCase().startsWith(searchLowerCase);
+      });
+  }
   },
   async mounted() {
     this.checkScreenSize();
@@ -318,7 +346,6 @@ export default {
       this.isSmallScreen = window.innerWidth < 960;
       this.colapseDate = window.innerWidth < 750;
       this.colapseRole = window.innerWidth < 560;
-      this.marginWidth = this.isSmallScreen ? '0px' : '70px';
     },
     roleStyle(role) {
       const defaultStyle = {background: '#eeeeee', color: '#000000'};
@@ -343,6 +370,17 @@ export default {
 .role {
   margin-right: 5px;
   margin-block: 5px;
+}
+
+.setting-button {
+  margin-left: 10px;
+  height: 48px !important;
+  margin-top: -20px !important;
+}
+
+.search-bar {
+  min-width: 300px !important;
+  margin-top: -20px !important;
 }
 
 .align-horizontally {
