@@ -9,30 +9,33 @@
             <v-form @submit-prevent="addUser">
                 <v-row>
                     <v-col>
-                        <label for="">Firstname*</label>
+                        <label for="">Firstname</label>
                         <v-text-field 
                         variant="outlined"
                         class="inputfield" required
                         :model-value="user.firstname" 
+                        :rules="[rules.required, rules.counter]"
                         @update:model-value="newValue => user.firstname = newValue" inputType="text" />
                     </v-col>
                     <v-col>
-                        <label for="">Lastname*</label>
+                        <label for="">Lastname</label>
                         <v-text-field 
                         variant="outlined"
                         class="inputfield"
                         :model-value="user.lastname" required
+                        :rules="[rules.required, rules.counter]"
                         @update:model-value="newValue => user.lastname = newValue" inputType="text" />
                     </v-col>
                 </v-row>
 
                 <v-row>
                     <v-col>
-                        <label for="">E-Mail-Address*</label>
+                        <label for="">E-Mail-Address</label>
                         <v-text-field 
                         variant="outlined"
                         class="inputfield" required
                         :model-value="user.email" 
+                        :rules="[rules.required, rules.email]"
                         @update:model-value="newValue => user.email = newValue" inputType="text" />
                     </v-col>
                     <v-col>
@@ -46,23 +49,20 @@
 
                 <v-row>
                     <v-col>
-                        <label for="">Roles*</label>
-                        <v-select
-                            :items="roles"
-                            item-title="name"
-                            item-value="id"
-                            v-model="selectedRoles"
-                            bg-color="none"
-                            multiple
-                            variant="outlined"
+                        <label for="">Roles</label>
+                        <v-select clearable class="mt-1" 
+                            v-model="selectedRoles" multiple
+                            :rules="[rules.required, rules.roles]"
+                            :items="roles" variant="outlined" required
                         >
+
                             <template v-slot:selection="{item, index}">
-                                <v-chip v-if="index < 2">
+                                <v-chip v-if="index < 2"  :style="roleStyle(item)">
                                     <span>{{ item.title }}</span>
                                 </v-chip>
                                 <span 
-                                v-if="index === 2"
-                                class="text-grey text-caption align-self-center"
+                                    v-if="index === 2"
+                                    class="text-grey text-caption align-self-center"
                                 >
                                     (+{{ selectedRoles.length - 2 }} others)
                                 </span>
@@ -89,20 +89,24 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <label for="">Password*</label>
+                        <label for="">Password</label>
                         <v-text-field 
                         variant="outlined"
                         class="inputfield" 
                         required
-                        :model-value="password" 
-                        @update:model-value="newValue => password = newValue" inputType="secure"/>
+                        :model-value="user.password" 
+                        type="password"
+                        :rules="[rules.required, rules.counter]"
+                        @update:model-value="newValue => user.password = newValue" inputType="secure"/>
                     </v-col>
                     <v-col>
-                        <label for="">Confirm Password*</label>
+                        <label for="">Confirm Password</label>
                         <v-text-field 
                         variant="outlined"
                         class="inputfield"
+                        type="password"
                         :model-value="confirmpassword" required
+                        :rules="[rules.required, rules.counter]"
                         @update:model-value="newValue => confirmpassword = newValue" inputType="secure"/>
                     </v-col>
                 </v-row>
@@ -136,6 +140,31 @@
                 showDatePicker: false,
                 dob: new Date(),
                 tempDate: this.defaultDate,
+                roles: [
+                    {id: 1, title: 'Administrator'},
+                    {id: 2, title: 'Auditor'},
+                    {id: 3, title: 'Auditee'},
+                    {id: 4, title: 'Reporter'},
+                    {id: 5, title: 'Gast'},
+                    {id: 6, title: 'Manual writer'}
+                ],
+                roleColors: {
+                    Administrator: {background: '#e2ecf7', color: '#1c6ac1'},
+                    Auditor: {background: '#e8f5e9', color: '#5fb762'},
+                    Auditee: {background: '#dff6f9', color: '#00bcd4'},
+                    Reporter: {background: '#fde7e5', color: '#f44336'},
+                    Gast: {background: '#fff2df', color: '#ff9800'},
+                    'Manual writer': {background: '#d1c4e9', color: '#7e57c2'}
+                },
+                rules: {
+                    required: value => !!value || 'Field Required.',
+                    counter: value => value.length <= 50 || 'Max 50 characters.',
+                    email: value => {
+                        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                        return pattern.test(value) || 'Invalid e-mail.'
+                    },
+                    roles: value => this.selectedRoles.length > 0 || 'At least one role must be selected.',
+                },
             }
         },
         async mounted() {
@@ -168,56 +197,69 @@
             back() {
                 this.$router.push({ name: 'Home' });
             },
+            validateField(fieldValue, rules) {
+                for (let rule of rules) {
+                    const result = rule(fieldValue);
+                    if (result !== true) {
+                        return result;
+                    }
+                }
+                return true;
+            },
             async addUser() {
-                this.invalidInput = '';
                 let user = this.user;
+                let rules = this.rules;
+
+                const fieldsToValidate = [
+                    { field: user.firstname, validators: [rules.required, rules.counter] },
+                    { field: user.lastname, validators: [rules.required, rules.counter] },
+                    { field: user.email, validators: [rules.required, rules.email] },
+                    { field: user.password, validators: [rules.required, rules.counter] },
+                    { field: this.selectedRoles, validators: [rules.required, rules.roles] }
+                ];
+
+                for (let field of fieldsToValidate) {
+                    const result = this.validateField(field.field, field.validators);
+                    if (result !== true) {
+                        this.invalidInput = result;
+                        return;
+                    }
+                }
+
+                if (user.password !== this.confirmpassword) {
+                    console.log(user.password, this.confirmpassword)
+                    this.invalidInput = 'Passwords do not match.';
+                    return;
+                }
+
+                const selectedRoleIds = this.selectedRoles.map(selectedRole => {
+                    const matchingRole = this.roles.find(role => role.title === selectedRole);
+                    return matchingRole ? matchingRole.id : null;
+                }).filter(id => id !== null);
+
+                user.roles = selectedRoleIds;
 
                 try {
-                    if(user.firstname == null ||user.firstname == '' || user.lastname == null || user.lastname == '' ||
-                       user.email == null || user.email == '' || this.selectedRoles.length == 0 || this.password == null || this.password == '' || 
-                       this.confirmpassword == null || this.confirmpassword == '') {
-                        this.invalidInput = 'Please fill out all required fields.';
-
-                    } else if(!(/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(user.email))) {
-                        this.invalidInput = 'Invalid e-mail.'
-
-                    } else if(this.password != this.confirmpassword) {
-                        this.invalidInput = 'Password mismatch.';
-                    } else if(!(/^\d{7,15}$/.test(user.phoneNumber)))
-                        this.invalidInput = 'Invalide phone-number'
-                    else {
-                        const formData = new URLSearchParams();
-
-                        formData.append('firstname', user.firstname.charAt(0).toUpperCase() + user.firstname.slice(1));
-                        formData.append('lastname', user.lastname.charAt(0).toUpperCase() + user.lastname.slice(1));
-                        formData.append('email', user.email);
-                        formData.append('passwordHash', this.password);
-                        formData.append('phoneNumber', user.phoneNumber);
-
-                        if(this.dob != new Date()) 
-                            formData.append('birthdate', this.dob);
-                        console.log(this.selectedRoles)
-                        formData.append('roles', this.selectedRoles);
-                        const priviledgeValue = this.selectedRoles.includes(1) ? [1] : [2];
-                        formData.append('priviledgeRoles', priviledgeValue);
-
-                        const response = await axios.post('users/add', formData, {
-                            withCredentials: true
-                        });
-
-                        if (response.status === 200 && response.data) {
-                            this.$router.push({name: 'Home'});
-                        } else {
-                           alert('An error occurred, pleaes try again.');
-                        }
+                    const respones = await axios.post('/users/add', user);
+                    if(respones.status === 200) {
+                        this.$router.push({ name: 'Home' });
+                    } else {
+                        this.invalidInput = 'Something went wrong. Please try again.';
                     }
                 } catch (error) {
-                   alert(error)
+                    console.error(error);
                 }
+
+
+                    
             },
             handleDateUpdate(newDate) {
                 this.dob = newDate;
-            }
+            },
+            roleStyle(role) {
+                const defaultStyle = {background: '#eeeeee', color: '#000000'};
+                return this.roleColors[role.title] || defaultStyle;
+            },
         }
     };
 </script>
@@ -254,7 +296,7 @@
     }
 
     .error-message {
-        color: red;
+        color: #b10423;
         font-size: 12px;
         margin-top: 5px;
     }
@@ -266,5 +308,3 @@
         font-size: 10px;
     }
 </style>
-
-  

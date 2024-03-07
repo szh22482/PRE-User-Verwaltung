@@ -254,6 +254,7 @@ export default {
       isSmallScreen: false,
       colapseDate: false,
       colapseRole: false,
+      dialogs: [],
       users: [],
       roleColors: {
         Administrator: {background: '#e2ecf7', color: '#1c6ac1'},

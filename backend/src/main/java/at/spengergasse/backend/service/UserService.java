@@ -25,15 +25,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserToRolesRepository userToRolesRepository;
 
-    private static final HashMap<String, Long> roles = new HashMap<>(Map.of(
-            "ADMINISTRATOR", 1L,
-            "AUDITOR", 2L,
-            "AUDITEE", 3L,
-            "REPORTER", 4L,
-            "GAST", 5L,
-            "MANUAL_WRITER", 6L
-    ));
-
     public List<UserDto> fetchAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -83,30 +74,33 @@ public class UserService {
 
         try {
             User user = User.builder()
-                    .firstname(userRequest.firstname())
-                    .lastname(userRequest.lastname())
+                    .firstname(userRequest.firstname().toUpperCase().charAt(0) +
+                            userRequest.firstname().substring(1).toLowerCase())
+                    .lastname(userRequest.lastname().toUpperCase().charAt(0) +
+                            userRequest.lastname().substring(1).toLowerCase())
                     .email(userRequest.email())
                     .password(userRequest.password())
                     .created(LocalDate.now())
                     .deleted(false)
-                    .colorNumber((int) (Math.random() * 10))
+                    .colorNumber((int) (Math.random() * 7))
                     .build();
 
             List<UserToRoles> userToRoles = new ArrayList<>();
-            for(String roleName: userRequest.roles()) {
-                Long id = roles.get(roleName);
-                Role role = roleRepository.findById(id);
+            for(String roleId: userRequest.roles()) {
+                Role role = roleRepository.findById(Long.parseLong(roleId));
 
                 if (role == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Role " + roleName + " does not exist.");
+                            .body("Role " + roleId + " does not exist.");
                 }
 
-                userToRoles.add(UserToRoles.builder()
+                UserToRoles newRole = UserToRoles.builder()
                         .id(new UserToRolesId(user.getId(), role.getId()))
                         .user(user)
                         .role(role)
-                        .build());
+                        .build();
+
+                userToRoles.add(newRole);
             }
 
             user.setRoles(userToRoles);
