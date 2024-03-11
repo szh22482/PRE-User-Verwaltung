@@ -1,26 +1,24 @@
 <template>
   <v-container>
-    <v-row class="mb-4 mt-4" justify="space-between">
-      <v-col>
+    <v-row class="mb-4 mt-4" justify="start">
+      <v-col cols="12" md="6" lg="8" class="d-flex justify-start">
         <v-text-field
           v-model="search"
-          label="Search"
+          label="Search users"
           prepend-inner-icon="mdi-magnify"
           outlined
           variant="outlined"
-          density="comfortable"
-          class="search-bar"
+          density="compact"
+          class="search-bar me-3"
         ></v-text-field>
-      </v-col>
-      <v-col xs="12" md="auto" class="d-flex justify-end">
+
         <v-select
           v-model="selectedRoles"
           :items="availableRoles"
           variant="outlined"
           label="Filter"
           multiple
-          height="48px"
-          density="comfortable"
+          density="compact"
           style="min-width: 240px; max-width: 240px; margin-top: -20px;"
           @change="filterUsers"
           clearable
@@ -34,13 +32,22 @@
               </span>
           </template>
         </v-select>
+      </v-col>
+
+      <v-col cols="12" md="6" lg="4" class="d-flex justify-end">
         <v-btn 
-          variant="outlined"
-          append-icon="mdi-plus"
-          size="large"
-          class="setting-button"
+          variant="plain"
+          ripple="false"
+          class="setting-button text-none"
           @click="$router.push('/add')"
-        >Add</v-btn>
+        >Add new user</v-btn>
+        <v-btn 
+          color="black"
+          ripple="false"
+          size="large"
+          class="setting-button text-none rounded-lg"
+          @click="$router.push('/invite')"
+        >Invite User</v-btn>
       </v-col>
     </v-row>
 
@@ -411,20 +418,13 @@ export default {
 }
 
 .setting-button {
-  margin-left: 10px;
-  height: 48px !important;
+  height: 40px !important;
   margin-top: -20px !important;
 }
 
 .search-bar {
   min-width: 300px !important;
   margin-top: -20px !important;
-}
-
-.checkbox {
-  padding-inline: 10px !important;
-  padding-bottom: -30px !important;
-
 }
 
 .align-horizontally {
