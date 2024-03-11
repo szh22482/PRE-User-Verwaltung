@@ -2,7 +2,7 @@
   <v-container>
     <v-flex>
       <v-row class="mb-4 mt-4" justify="start" min-width="300"  >
-        <v-col cols="12" xs="12" md="6" lg="8" class="d-flex justify-start">
+        <v-col cols="12" lg="9" md="8" xs="12"  class="d-flex justify-start">
           <v-text-field
             v-model="search"
             label="Search users"
@@ -35,7 +35,7 @@
           </v-select>
         </v-col>
 
-        <v-col cols="12" md="6" lg="4" class="d-flex justify-end">
+        <v-col cols="12" lg="3" md="4" xs="12" class="d-flex justify-end">
           <v-btn 
             variant="plain"
             ripple="false"
