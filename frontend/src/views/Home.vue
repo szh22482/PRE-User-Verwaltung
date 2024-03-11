@@ -4,7 +4,7 @@
       <v-col>
         <v-text-field
           v-model="search"
-          placeholder="Search"
+          label="Search"
           prepend-inner-icon="mdi-magnify"
           outlined
           variant="outlined"
@@ -13,13 +13,27 @@
         ></v-text-field>
       </v-col>
       <v-col xs="12" md="auto" class="d-flex justify-end">
-        <v-btn
+        <v-select
+          v-model="selectedRoles"
+          :items="availableRoles"
           variant="outlined"
-          append-icon="mdi-filter"
-          size="large"
-          class="setting-button"
-        >Filter</v-btn>
-
+          label="Filter"
+          multiple
+          height="48px"
+          density="comfortable"
+          style="min-width: 240px; max-width: 240px; margin-top: -20px;"
+          @change="filterUsers"
+          clearable
+          >
+          <template v-slot:selection="{ item, index }">
+              <v-chip v-if="index < 1" :style="roleStyle(item)">
+              <span>{{ item.title }}</span>
+              </v-chip>
+              <span v-if="index === 1" class="text-grey text-caption align-self-center">
+              (+{{ selectedRoles.length - 1 }})
+              </span>
+          </template>
+        </v-select>
         <v-btn 
           variant="outlined"
           append-icon="mdi-plus"
@@ -273,6 +287,11 @@ export default {
       colapseRole: false,
       dialogs: [],
       users: [],
+      showFilterDropdown: false,
+      isDropdownOpen: false,
+      availableRoles: ['Administrator', 'Auditor', 'Auditee', 'Reporter', 'Gast', 'Manual writer'],
+      selectedRoles: [],
+      filteredUsers: [],
       roleColors: {
         Administrator: {background: '#e2ecf7', color: '#1c6ac1'},
         Auditor: {background: '#e8f5e9', color: '#5fb762'},
@@ -293,17 +312,6 @@ export default {
       ];
       return headers;
     },
-    filteredUsers() {
-      return this.users.filter(user => {
-        if (user.firstname == null || user.lastname == null || user.email == null) return false;
-        const fullName = (user.firstname + ' ' + user.lastname).toLowerCase();
-        const searchLowerCase = this.search.toLowerCase();
-        return fullName.startsWith(searchLowerCase) ||
-              user.firstname.toLowerCase().startsWith(searchLowerCase) ||
-              user.lastname.toLowerCase().startsWith(searchLowerCase) ||
-              user.email.toLowerCase().startsWith(searchLowerCase);
-      });
-  }
   },
   async mounted() {
     this.checkScreenSize();
@@ -312,6 +320,7 @@ export default {
       const response = await axios.get("/users/all");
       if (response != null) {
         this.users = response.data;
+        this.filteredUsers = response.data;
         console.log(this.users)
         this.dialogs = this.users.map(() => ({ showOuterDialog: false, showInnerDialog: false, showDeleteDialog: false}));
       } else {
@@ -324,7 +333,36 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.checkScreenSize);
   },
+  watch: {
+    selectedRoles: {
+      handler() {
+        this.isDropdownOpen = true;
+        this.filterUsers();
+      },
+      deep: true
+    },
+    search() {
+      this.filterUsers();
+    }
+  },
   methods: {
+    filterUsers() {
+      this.filteredUsers = this.users.filter(user => {
+        if (user.firstname == null || user.lastname == null || user.email == null) return false;
+        const fullName = (user.firstname + ' ' + user.lastname).toLowerCase();
+        const searchLowerCase = this.search.toLowerCase();
+        return fullName.startsWith(searchLowerCase) ||
+              user.firstname.toLowerCase().startsWith(searchLowerCase) ||
+              user.lastname.toLowerCase().startsWith(searchLowerCase) ||
+              user.email.toLowerCase().startsWith(searchLowerCase);
+      });
+
+      if (this.selectedRoles.length > 0) {
+        this.filteredUsers = this.filteredUsers.filter(user => {
+          return this.selectedRoles.every(role => user.roles.includes(role));
+        });
+      }
+    },
     openOutderDialog(index) {
       this.dialogs[index].showOuterDialog = true;
     },
@@ -349,7 +387,7 @@ export default {
     },
     roleStyle(role) {
       const defaultStyle = {background: '#eeeeee', color: '#000000'};
-      return this.roleColors[role] || defaultStyle;
+      return this.roleColors[role] || this.roleColors[role.title] || defaultStyle;
     },
     cancelEdit(index) {
       this.dialogs[index].showInnerDialog = false;
@@ -361,7 +399,7 @@ export default {
       this.users.splice(index, 1);
       this.dialogs.splice(index, 1);
       this.closeDeleteDialog(index);
-    }
+    },
   },
 }
 </script>
@@ -381,6 +419,12 @@ export default {
 .search-bar {
   min-width: 300px !important;
   margin-top: -20px !important;
+}
+
+.checkbox {
+  padding-inline: 10px !important;
+  padding-bottom: -30px !important;
+
 }
 
 .align-horizontally {
