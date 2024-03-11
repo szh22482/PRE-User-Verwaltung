@@ -1,5 +1,5 @@
 <template>
-    <div :style="{ 'margin-left': marginWidth }">
+    <div :class="{ 'mobile-background': isSmallScreen }" :style="{ 'margin-left': marginWidth }">
         <v-card-title class="ps-4 pb-0 mb-0 title">USERS</v-card-title>
         <v-card-subtitle class="ps-4 pt-0 mt-0 mb-5 subtitle">view and manage users</v-card-subtitle>
 
@@ -83,5 +83,9 @@ import Home from './Home.vue';
     .invited-tab {
         flex: 1;
         text-align: center;
+    }
+
+    .mobile-background {
+        width: 100%;
     }
 </style>

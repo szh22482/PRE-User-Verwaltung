@@ -1,60 +1,60 @@
 <template>
   <v-container>
-    <v-row class="mb-4 mt-4" justify="start">
-      <v-col cols="12" md="6" lg="8" class="d-flex justify-start">
-        <v-text-field
-          v-model="search"
-          label="Search users"
-          prepend-inner-icon="mdi-magnify"
-          outlined
-          variant="outlined"
-          density="compact"
-          class="search-bar me-3"
-        ></v-text-field>
+    <v-flex>
+      <v-row class="mb-4 mt-4" justify="start" min-width="300"  >
+        <v-col cols="12" xs="12" md="6" lg="8" class="d-flex justify-start">
+          <v-text-field
+            v-model="search"
+            label="Search users"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            density="compact"
+            class="search-bar me-3"
+            style="min-width: 145px !important;"
+          ></v-text-field>
 
-        <v-select
-          v-model="selectedRoles"
-          :items="availableRoles"
-          variant="outlined"
-          label="Filter"
-          multiple
-          density="compact"
-          style="min-width: 240px; max-width: 240px; margin-top: -20px;"
-          @change="filterUsers"
-          clearable
-          >
-          <template v-slot:selection="{ item, index }">
-              <v-chip v-if="index < 1" :style="roleStyle(item)">
-              <span>{{ item.title }}</span>
-              </v-chip>
-              <span v-if="index === 1" class="text-grey text-caption align-self-center">
-              (+{{ selectedRoles.length - 1 }})
-              </span>
-          </template>
-        </v-select>
-      </v-col>
+          <v-select
+            v-model="selectedRoles"
+            :items="availableRoles"
+            variant="outlined"
+            label="Filter"
+            multiple
+            density="compact"
+            style="min-width: 155px; max-width: 240px; margin-top: -20px;"
+            @change="filterUsers"
+            clearable
+            >
+            <template v-slot:selection="{ item, index }">
+                <v-chip v-if="index < 1" :style="roleStyle(item)">
+                <span>{{ item.title }}</span>
+                </v-chip>
+                <span v-if="index === 1" class="text-grey text-caption align-self-center">
+                (+{{ selectedRoles.length - 1 }})
+                </span>
+            </template>
+          </v-select>
+        </v-col>
 
-      <v-col cols="12" md="6" lg="4" class="d-flex justify-end">
-        <v-btn 
-          variant="plain"
-          ripple="false"
-          class="setting-button text-none"
-          @click="$router.push('/add')"
-        >Add new user</v-btn>
-        <v-btn 
-          color="black"
-          ripple="false"
-          size="large"
-          class="setting-button text-none rounded-lg"
-          @click="$router.push('/invite')"
-        >Invite User</v-btn>
-      </v-col>
-    </v-row>
-
+        <v-col cols="12" md="6" lg="4" class="d-flex justify-end">
+          <v-btn 
+            variant="plain"
+            ripple="false"
+            class="setting-button text-none"
+            @click="$router.push('/add')"
+          >Add new user</v-btn>
+          <v-btn 
+            color="black"
+            ripple="false"
+            size="large"
+            class="setting-button text-none rounded-lg"
+            @click="$router.push('/invite')"
+          >Invite User</v-btn>
+        </v-col>
+      </v-row>
+    </v-flex>
     <v-data-table
       class="rounded-lg"
       :items="filteredUsers"
-      :search="search"
       :headers="dynamicHeaders"
     >
       <template v-slot:headers>
@@ -266,8 +266,7 @@
                   </v-dialog>
             </template>
 
-      <template v-slot:bottom>
-      </template> <!-- removes the default footer -->
+      
     </v-data-table>
   </v-container>
 </template>
