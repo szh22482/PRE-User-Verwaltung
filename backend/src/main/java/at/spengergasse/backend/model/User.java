@@ -50,7 +50,8 @@ public class User {
             return roleName;
         }
         roleName = roleName.replace("_", " ");
-        return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase();
+
+        return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase().replace("w", "W");
     }
 
     public List<UserToRoles> toRoles(List<String> roles) {

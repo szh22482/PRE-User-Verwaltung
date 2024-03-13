@@ -295,7 +295,7 @@ export default {
       users: [],
       showFilterDropdown: false,
       isDropdownOpen: false,
-      availableRoles: ['Administrator', 'Auditor', 'Auditee', 'Reporter', 'Gast', 'Manual writer'],
+      availableRoles: ['Administrator', 'Auditor', 'Auditee', 'Reporter', 'Gast', 'Manual Writer'],
       selectedRoles: [],
       filteredUsers: [],
       roleColors: {
@@ -304,7 +304,7 @@ export default {
         Auditee: {background: '#dff6f9', color: '#00bcd4'},
         Reporter: {background: '#fde7e5', color: '#f44336'},
         Gast: {background: '#fff2df', color: '#ff9800'},
-        'Manual writer': {background: '#d1c4e9', color: '#7e57c2'}
+        'Manual Writer': {background: '#d1c4e9', color: '#7e57c2'}
       }
     }
   },

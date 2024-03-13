@@ -75,7 +75,7 @@
                     Auditee: {background: '#dff6f9', color: '#00bcd4'},
                     Reporter: {background: '#fde7e5', color: '#f44336'},
                     Gast: {background: '#fff2df', color: '#ff9800'},
-                    'Manual writer': {background: '#d1c4e9', color: '#7e57c2'}
+                    'Manual Writer': {background: '#d1c4e9', color: '#7e57c2'}
                 },
                 roles: [
                     {id: 1, title: 'Administrator'},
@@ -83,7 +83,7 @@
                     {id: 3, title: 'Auditee'},
                     {id: 4, title: 'Reporter'},
                     {id: 5, title: 'Gast'},
-                    {id: 6, title: 'Manual writer'}
+                    {id: 6, title: 'Manual Writer'}
                 ],
                 rules: {
                     required: value => !!value || 'Required.',
