@@ -176,7 +176,10 @@
       <template v-slot:item.roles="{ item }">
         <v-dialog>
           <template v-slot:activator="{ props }">
-            <div v-if="!colapseDate && item.roles && item.roles.length > 0">
+            <div v-if="item.roles.length == 0">
+
+            </div>
+            <div v-else-if="!colapseDate && item.roles && item.roles.length > 0">
               <v-chip
                 class="role"
                 v-for="(role, index) in item.roles"
@@ -326,6 +329,7 @@ export default {
       const response = await axios.get("/users/all");
       if (response != null) {
         this.users = response.data;
+        console.log(response.data)
         this.filteredUsers = response.data;
         console.log(this.users)
         this.dialogs = this.users.map(() => ({ showOuterDialog: false, showInnerDialog: false, showDeleteDialog: false}));
@@ -392,6 +396,7 @@ export default {
       this.colapseRole = window.innerWidth < 560;
     },
     roleStyle(role) {
+      if (!role) return;
       const defaultStyle = {background: '#eeeeee', color: '#000000'};
       return this.roleColors[role] || this.roleColors[role.title] || defaultStyle;
     },

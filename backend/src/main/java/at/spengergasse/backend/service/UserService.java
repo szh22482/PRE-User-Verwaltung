@@ -51,6 +51,10 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("Login Successful!");
     }
 
+    private boolean checkPassword(User user, String password) {
+        return user.getPassword().equals(password);
+    }
+
     public ResponseEntity<?> addUser(UserRequest userRequest) {
         //validate user input
         if (userRequest.firstname() == null || userRequest.lastname() == null ||
@@ -85,8 +89,7 @@ public class UserService {
                     .colorNumber((int) (Math.random() * 7))
                     .build();
 
-            List<UserToRoles> userToRoles = new ArrayList<>();
-            for(String roleId: userRequest.roles()) {
+            for(String roleId : userRequest.roles()) {
                 Role role = roleRepository.findById(Long.parseLong(roleId));
 
                 if (role == null) {
@@ -94,16 +97,15 @@ public class UserService {
                             .body("Role " + roleId + " does not exist.");
                 }
 
-                UserToRoles newRole = UserToRoles.builder()
+                UserToRoles userToRoles = UserToRoles.builder()
                         .id(new UserToRolesId(user.getId(), role.getId()))
                         .user(user)
                         .role(role)
                         .build();
 
-                userToRoles.add(newRole);
+                user.addRole(userToRoles);
             }
 
-            user.setRoles(userToRoles);
             userRepository.save(user);
             return ResponseEntity.ok(UserDto.fromEntity(user));
 
@@ -111,10 +113,6 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("An error occurred while adding user: " + e.getMessage());
         }
-    }
-
-    private boolean checkPassword(User user, String password) {
-        return user.getPassword().equals(password);
     }
 
     public ResponseEntity<?> editUser(UserDto userDto, String email) {
@@ -140,49 +138,37 @@ public class UserService {
         user.setPassword(userDto.password());
 
         try {
-            List<UserToRoles> findRoles = userToRolesRepository.findByUser(user);
-            List<UserToRoles> roles = new ArrayList<>();
-
-            for(UserToRoles deleteRole: findRoles) {
-                boolean found = false;
-                for(String role: userDto.roles()) {
-                    if (Objects.equals(Long.parseLong(role), deleteRole.getRole().getId())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if(!found) {
-                    userToRolesRepository.deleteById(deleteRole.getId());
-                    user.getRoles().remove(deleteRole);
-                    userRepository.save(user);
+            List<UserToRoles> rolesToDelete = new ArrayList<>();
+            for(UserToRoles role : user.getRoles()) {
+                if(userDto.roles().contains(Objects.requireNonNull(role.getRole().getId()).toString())) {
+                    rolesToDelete.add(role);
                 }
             }
 
-            for(String roleId: userDto.roles()) {
-                try {
-                    Long roleIdLong = Long.parseLong(roleId);
-                    Role role = roleRepository.findById(roleIdLong);
-                    if(role != null) {
-                        UserToRoles userRole = UserToRoles.builder()
-                                .id(new UserToRolesId(user.getId(), role.getId()))
-                                .user(user)
-                                .role(role)
-                                .build();
-                        roles.add(userRole);
-                    }
-                } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("An error occurred while updating the user roles.");
+            for(UserToRoles role : rolesToDelete) {
+                user.removeRole(role.getRole());
+                role.getRole().removeUser(user);
+                userToRolesRepository.deleteById(role.getId());
+            }
+
+            for(String roleId : userDto.roles()) {
+                Role role = roleRepository.findById(Long.parseLong(roleId));
+                if (role == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Role " + roleId + " does not exist.");
+                }
+                if(!user.containsRole(role)) {
+                    UserToRoles userToRoles = UserToRoles.builder()
+                            .id(new UserToRolesId(user.getId(), role.getId()))
+                            .user(user)
+                            .role(role)
+                            .build();
+                    user.addRole(userToRoles);
+                    userToRolesRepository.save(userToRoles);
                 }
             }
 
-            for(UserToRoles role: roles) {
-                if(!findRoles.contains(role)) userToRolesRepository.save(role);
-            }
-
-            user.setRoles(roles);
             userRepository.save(user);
-
             return ResponseEntity.ok("User updated successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

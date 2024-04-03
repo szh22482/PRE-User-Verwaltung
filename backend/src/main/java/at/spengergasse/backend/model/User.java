@@ -35,7 +35,6 @@ public class User {
     private Boolean deleted;
     private LocalDate created;
     private LocalDate deletedDate;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<UserToRoles> roles;
 
@@ -54,12 +53,26 @@ public class User {
         return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase().replace("w", "W");
     }
 
-    public List<UserToRoles> toRoles(List<String> roles) {
+    /*public List<UserToRoles> toRoles(List<String> roles) {
         return roles.stream().map(role -> UserToRoles.builder()
                 .id(new UserToRolesId(this.getId(), Role.builder().roleName(ERoles.valueOf(role)).build().getId()))
                 .user(this)
                 .role(Role.builder().roleName(ERoles.valueOf(role)).build()).build())
                 .collect(Collectors.toList());
+    }*/
+
+    public boolean containsRole(Role role) {
+        return roles.stream().anyMatch(r -> r.getRole().equals(role));
+    }
+
+    public void addRole(UserToRoles userToRoles) {
+        if (!containsRole(userToRoles.getRole())) {
+            this.roles.add(userToRoles);
+        }
+    }
+
+    public void removeRole(Role role) {
+        this.roles.removeIf(r -> r.getRole().equals(role));
     }
 
     public void setRoles(List<UserToRoles> roles) {

@@ -19,4 +19,8 @@ public class Role extends AbstractPersistable<Long> {
 
     @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
     private List<UserToRoles> userList;
+
+    public void removeUser(User user) {
+       this.userList.removeIf(userToRoles -> userToRoles.getUser().equals(user));
+    }
 }
