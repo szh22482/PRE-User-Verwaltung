@@ -14,7 +14,7 @@ public class UserToRoles {
     @EmbeddedId
     private UserToRolesId id;
 
-    @ManyToOne
+    @ManyToOne( cascade = CascadeType.PERSIST)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;

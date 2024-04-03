@@ -2,7 +2,6 @@ package at.spengergasse.backend.dto;
 
 import at.spengergasse.backend.model.User;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public record UserDto (
                         user.getDeleted(),
                         user.getCreated(),
                         user.getDeletedDate(),
-                        user.getRoles(),
+                        user.getRoleNames(),
                         user.getColorNumber()
                 );
         }

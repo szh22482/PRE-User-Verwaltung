@@ -10,8 +10,13 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: () => import( '@/views/Home.vue'),
+    component: () => import( '@/views/HomeView.vue'),
   },
+  {
+    path: '/add',
+    name: 'Add',
+    component: () => import( '@/views/AddUser.vue'),
+  }
 ]
 
 const router = createRouter({

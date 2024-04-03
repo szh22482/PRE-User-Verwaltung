@@ -1,6 +1,6 @@
 <template>
     <div class="profile-picture" :style="generateRandomColor()">
-        <img :alt="generateInitials()">
+        {{ generateInitials() }}
     </div>
 </template>
 
@@ -9,16 +9,13 @@
         data() {
             return {
                 colors: {
-                        0: {bg: '#dfe1ff', text: '#6264a7'},
-                        1: {bg: '#FFE7E7', text: '#944E63'},
-                        2: {bg: '#7FC7D9', text: '#365486'},
-                        3: {bg: '#F8FAE5', text: '#43766C'},
-                        4: {bg: '#F2AFEF', text: '#33186B'},
-                        5: {bg: '#F3EDC8', text: '#BF3131'},
-                        6: {bg: '#ECF4D6', text: '#265073'},
-                        7: {bg: '#F3F3F3', text: '#860A35'},
-                        8: {bg: '#739072', text: '#3A4D39'},
-                        9: {bg: '#E5C3A6', text: '#2E4374'},
+                        0: {bg: '#d3cfe8', text: '#28214d'}, //
+                        1: {bg: '#ffd3c8', text: '#7c2513'}, //
+                        2: {bg: '#c3d4dc', text: '#002833'}, //
+                        3: {bg: '#e7eedd', text: '#4a6137'}, //
+                        4: {bg: '#cdd9dc', text: '#03171c'}, //
+                        5: {bg: '#f9d8df', text: '#72283b'}, //
+                        6: {bg: '#c8ebf2', text: '#005562'}, //
                 }
             }
         },
