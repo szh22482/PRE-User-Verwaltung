@@ -2,7 +2,6 @@ package at.spengergasse.backend.persistence;
 
 import at.spengergasse.backend.model.ERoles;
 import at.spengergasse.backend.model.Role;
-import at.spengergasse.backend.model.RoleTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,7 @@ class RoleRepositoryTest {
     private RoleRepository roleRepository;
 
     @Test
-    public void testFindById() {
+    public void verifyFindById() {
         // Suche die Rolle nach der ID
         Role retrievedRole = roleRepository.findById(1L);
 
@@ -28,7 +27,7 @@ class RoleRepositoryTest {
     }
 
     @Test
-    public void testFindByRoleName() {
+    public void verifyFindByRoleName() {
         // Suche die Rolle nach dem Rollennamen
         Role retrievedRole = roleRepository.findByRoleName(ERoles.AUDITOR);
 
@@ -38,13 +37,13 @@ class RoleRepositoryTest {
     }
 
     @Test
-    public void testFindAllRoles() {
+    public void verifyFindAllRole() {
         // Suche alle Rollen
         List<Role> allRoles = roleRepository.findAll();
 
         // Überprüfe, ob die gespeicherten Rollen korrekt abgerufen wurden
         assertThat(allRoles).isNotNull();
-        assertThat(allRoles.size() >= 2); // Annahme: Es gibt bereits 6 Rollen in der Datenbank
+        assertThat(!allRoles.isEmpty());
     }
 
 }

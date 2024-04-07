@@ -11,7 +11,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     User save(User user);
     Optional<User> findById(UUID id);
     Optional<User> findByEmail(String email);
-    User findByLastname(String lastname);
     List<User> findAll();
     void delete(User user); //for testing purposes
 }

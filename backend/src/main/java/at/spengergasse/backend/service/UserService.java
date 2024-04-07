@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.lang.Float.isNaN;
+
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Service
 @Transactional
@@ -38,17 +40,17 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if(optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Login, Email wrong");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login, email wrong");
         }
 
         //Get actual user from optional
         User user = optionalUser.get();
 
         if(!checkPassword(user, password)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Login, Password wrong");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login, password wrong");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("Login Successful!");
+        return ResponseEntity.status(HttpStatus.OK).body("Login successful!");
     }
 
     private boolean checkPassword(User user, String password) {
@@ -57,7 +59,7 @@ public class UserService {
 
     public ResponseEntity<?> addUser(UserRequest userRequest) {
         //validate user input
-        if (userRequest.firstname() == null || userRequest.lastname() == null ||
+        if (userRequest == null || userRequest.firstname() == null || userRequest.lastname() == null ||
                 userRequest.email() == null || userRequest.password() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Firstname, lastname, email and password are required.");
@@ -84,12 +86,16 @@ public class UserService {
                             userRequest.lastname().substring(1).toLowerCase())
                     .email(userRequest.email())
                     .password(userRequest.password())
-                    .created(LocalDate.now())
-                    .deleted(false)
                     .colorNumber((int) (Math.random() * 7))
                     .build();
 
             for(String roleId : userRequest.roles()) {
+                try {
+                    Long.parseLong(roleId);
+                } catch(NumberFormatException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Role ID must be a number.");
+                }
                 Role role = roleRepository.findById(Long.parseLong(roleId));
 
                 if (role == null) {
@@ -140,7 +146,7 @@ public class UserService {
         try {
             List<UserToRoles> rolesToDelete = new ArrayList<>();
             for(UserToRoles role : user.getRoles()) {
-                if(userDto.roles().contains(Objects.requireNonNull(role.getRole().getId()).toString())) {
+                if(!userDto.roles().contains(Objects.requireNonNull(role.getRole().getId()).toString())) {
                     rolesToDelete.add(role);
                 }
             }

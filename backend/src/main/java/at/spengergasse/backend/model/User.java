@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
-@Builder
 @ToString
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,6 +38,23 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<UserToRoles> roles;
 
+    @Builder
+    public User(String firstname, String lastname, int colorNumber, String email, String password, List<UserToRoles> roles) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.colorNumber = colorNumber;
+        this.email = email;
+        this.password = password;
+        this.deleted = false;
+        this.created = LocalDate.now();
+        this.deletedDate = null;
+        if(this.roles == null) {
+            this.roles = new ArrayList<>();
+        } else {
+            this.roles = roles;
+        }
+    }
+
     public List<String> getRoleNames() {
         return roles.stream()
                 .map(r -> capitalizeFirstLetter(r.getRole().getRoleName().toString()))
@@ -52,14 +69,6 @@ public class User {
 
         return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase().replace("w", "W");
     }
-
-    /*public List<UserToRoles> toRoles(List<String> roles) {
-        return roles.stream().map(role -> UserToRoles.builder()
-                .id(new UserToRolesId(this.getId(), Role.builder().roleName(ERoles.valueOf(role)).build().getId()))
-                .user(this)
-                .role(Role.builder().roleName(ERoles.valueOf(role)).build()).build())
-                .collect(Collectors.toList());
-    }*/
 
     public boolean containsRole(Role role) {
         return roles.stream().anyMatch(r -> r.getRole().equals(role));

@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PutMapping("delete/{email}")
-    public @ResponseStatus ResponseEntity delete(@PathVariable final String email) {
+    public ResponseEntity<?> delete(@PathVariable final String email) {
         return userService.deleteUser(email);
     }
 }

@@ -42,9 +42,6 @@ public record UserDto (
                         .lastname(userDto.lastname())
                         .email(userDto.email())
                         .password(userDto.password())
-                        .deleted(false)
-                        .created(LocalDate.now())
-                        .deletedDate(null)
                         .roles(null) //roles will be set later on
                         .build();
         }
