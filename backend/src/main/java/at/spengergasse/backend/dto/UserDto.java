@@ -3,6 +3,7 @@ package at.spengergasse.backend.dto;
 import at.spengergasse.backend.model.User;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,8 @@ public record UserDto (
                         user.getDeleted(),
                         user.getCreated(),
                         user.getDeletedDate(),
-                        user.getRoleNames(),
+                        user.getRoles().stream().map(
+                                role -> roleMap.get(role.getRole().getRoleName().toString())).toList(),
                         user.getColorNumber()
                 );
         }
@@ -45,4 +47,14 @@ public record UserDto (
                         .roles(null) //roles will be set later on
                         .build();
         }
+
+        //put 6 element in the map
+        private static HashMap<String, String> roleMap = new HashMap<>() {{
+                put("ADMINISTRATOR", "1");
+                put("AUDITOR", "2");
+                put("AUDITEE", "3");
+                put("GAST", "4");
+                put("REPORTER", "5");
+                put("MANUAL_WRITER", "6");
+        }};
 }

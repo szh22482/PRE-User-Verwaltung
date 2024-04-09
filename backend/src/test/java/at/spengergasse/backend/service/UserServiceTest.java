@@ -219,4 +219,199 @@ public class UserServiceTest {
         assertThat(response.getBody()).isEqualTo("Firstname, lastname, email and password are required.");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+    @Test
+    void verifyEditUserDtoIsNull() {
+        ResponseEntity<?> response = userService.editUser(null, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User data is required.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void verifyEditUserEmailIsNull() {
+        ResponseEntity<?> response = userService.editUser(userDto, null);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User not found.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void verifyEditUserEmailNotFound() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = userService.editUser(userDto, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User not found.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void verifyEditUserEmailAlreadyExists() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+
+        User user1 = User.builder()
+                .firstname("Max")
+                .lastname("Mustermann")
+                .email("max1@mustermann.com")
+                .colorNumber(4)
+                .password("pass123")
+                .roles(new ArrayList<>())
+                .build();
+
+        UserDto userDto1 = UserDto.fromEntity(user1);
+        when(userRepository.findByEmail("max1@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto1)));
+
+        ResponseEntity<?> response = userService.editUser(userDto1, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("Email already exists.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void verifyEditUser() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+
+        User user1 = User.builder()
+                .firstname("Max")
+                .lastname("Mustermann")
+                .email("max1@mustermann.com")
+                .colorNumber(4)
+                .password("pass123")
+                .roles(new ArrayList<>())
+                .build();
+
+        user1.addRole( UserToRoles.builder()
+                .id(new UserToRolesId(uuid, 1L))
+                .user(user1)
+                .role(Role.builder()
+                        .roleName(ERoles.ADMINISTRATOR)
+                        .build())
+                .build());
+
+        UserDto userDto1 = UserDto.fromEntity(user1);
+
+        ResponseEntity<?> response = userService.editUser(userDto1, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User updated successfully");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void verifyEditUserNoChange() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+
+        ResponseEntity<?> response = userService.editUser(userDto, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User updated successfully");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void verifyEditUserNewRole() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+
+        User user1 = User.builder()
+                .firstname("Max")
+                .lastname("Mustermann")
+                .email("max1@mustermann.com")
+                .colorNumber(4)
+                .password("pass123")
+                .roles(new ArrayList<>())
+                .build();
+
+        user1.addRole(UserToRoles.builder()
+                .id(new UserToRolesId(uuid, 1L))
+                .user(user1)
+                .role(Role.builder()
+                        .roleName(ERoles.ADMINISTRATOR)
+                        .build())
+                .build());
+
+        user1.addRole(UserToRoles.builder()
+                .id(new UserToRolesId(uuid, 1L))
+                .user(user1)
+                .role(Role.builder()
+                        .roleName(ERoles.AUDITOR)
+                        .build())
+                .build());
+
+        UserDto userDto1 = UserDto.fromEntity(user1);
+
+        ResponseEntity<?> response = userService.editUser(userDto1, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User updated successfully");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void verifyEditUserRemoveRole() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+
+        User user1 = User.builder()
+                .firstname("Max")
+                .lastname("Mustermann")
+                .email("max1@mustermann.com")
+                .colorNumber(4)
+                .password("pass123")
+                .roles(new ArrayList<>())
+                .build();
+
+        user1.addRole(UserToRoles.builder()
+                .id(new UserToRolesId(uuid, 1L))
+                .user(user1)
+                .role(Role.builder()
+                        .roleName(ERoles.GAST)
+                        .build())
+                .build());
+
+        user1.addRole(UserToRoles.builder()
+                .id(new UserToRolesId(uuid, 1L))
+                .user(user1)
+                .role(Role.builder()
+                        .roleName(ERoles.AUDITOR)
+                        .build())
+                .build());
+
+        UserDto userDto1 = UserDto.fromEntity(user1);
+
+        ResponseEntity<?> response = userService.editUser(userDto1, "max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User updated successfully");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void verifyDeleteUser() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+
+        ResponseEntity<?> response = userService.deleteUser("max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User deleted successfully");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void verifyDeleteUserNotFound() {
+        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = userService.deleteUser("max@mustermann.com");
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isEqualTo("User not found.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
 }
