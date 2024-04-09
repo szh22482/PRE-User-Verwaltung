@@ -12,7 +12,8 @@ public record UserDto (
         String firstname,
         String lastname,
         String email,
-        String password,
+        String salt,
+        String hash,
         Boolean deleted,
         LocalDate created,
         LocalDate deletedDate,
@@ -27,12 +28,29 @@ public record UserDto (
                         user.getFirstname(),
                         user.getLastname(),
                         user.getEmail(),
-                        user.getPassword(),
+                        user.getSalt(),
+                        user.getHash(),
                         user.getDeleted(),
                         user.getCreated(),
                         user.getDeletedDate(),
                         user.getRoles().stream().map(
                                 role -> roleMap.get(role.getRole().getRoleName().toString())).toList(),
+                        user.getColorNumber()
+                );
+        }
+
+        public static UserDto fromEntityWithRoleNames(User user) {
+                return new UserDto(
+                        user.getId(),
+                        user.getFirstname(),
+                        user.getLastname(),
+                        user.getEmail(),
+                        user.getSalt(),
+                        user.getHash(),
+                        user.getDeleted(),
+                        user.getCreated(),
+                        user.getDeletedDate(),
+                        user.getRoleNames(),
                         user.getColorNumber()
                 );
         }
@@ -43,7 +61,8 @@ public record UserDto (
                         .firstname(userDto.firstname())
                         .lastname(userDto.lastname())
                         .email(userDto.email())
-                        .password(userDto.password())
+                        .salt(userDto.salt())
+                        .hash(userDto.hash())
                         .roles(null) //roles will be set later on
                         .build();
         }

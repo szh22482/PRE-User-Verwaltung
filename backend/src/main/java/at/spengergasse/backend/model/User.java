@@ -31,7 +31,8 @@ public class User {
     private int colorNumber; //number between 0 and 6
     @Column(unique = true)
     private String email;
-    private String password;
+    private String salt;
+    private String hash;
     private Boolean deleted;
     private LocalDate created;
     private LocalDate deletedDate;
@@ -39,12 +40,13 @@ public class User {
     private List<UserToRoles> roles;
 
     @Builder
-    public User(String firstname, String lastname, int colorNumber, String email, String password, List<UserToRoles> roles) {
+    public User(String firstname, String lastname, int colorNumber, String email, String salt, String hash, List<UserToRoles> roles) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.colorNumber = colorNumber;
         this.email = email;
-        this.password = password;
+        this.salt = salt;
+        this.hash = hash;
         this.deleted = false;
         this.created = LocalDate.now();
         this.deletedDate = null;
@@ -67,7 +69,8 @@ public class User {
         }
         roleName = roleName.replace("_", " ");
 
-        return roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase().replace("w", "W");
+        return roleName.substring(0, 1).toUpperCase() +
+                roleName.substring(1).toLowerCase().replace("w", "W");
     }
 
     public boolean containsRole(Role role) {
@@ -82,9 +85,5 @@ public class User {
 
     public void removeRole(Role role) {
         this.roles.removeIf(r -> r.getRole().equals(role));
-    }
-
-    public void setRoles(List<UserToRoles> roles) {
-        this.roles = roles;
     }
 }

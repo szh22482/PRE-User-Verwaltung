@@ -4,8 +4,10 @@ import at.spengergasse.backend.dto.UserDto;
 import at.spengergasse.backend.dto.UserRequest;
 import at.spengergasse.backend.model.*;
 import at.spengergasse.backend.persistence.UserRepository;
+import at.spengergasse.backend.persistence.UserToRolesRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -29,6 +32,8 @@ public class UserServiceTest {
     private UserService userService;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private UserToRolesRepository userToRolesRepository;
 
     private static UserDto userDto;
     private static UserRequest userRequest;
@@ -41,7 +46,8 @@ public class UserServiceTest {
                 .lastname("Mustermann")
                 .email("max@mustermann.com")
                 .colorNumber(4)
-                .password("pass123")
+                .hash("4+PnW/Pa33wgVeyICuQ6UVMewVTaPIEjsOCA+oqu2Wc=")
+                .salt("38U2JMkKZ+xrvBBS3hhyaw==")
                 .roles(new ArrayList<>())
                 .build();
 
@@ -49,7 +55,7 @@ public class UserServiceTest {
                 .firstname("Max")
                 .lastname("Mustermann")
                 .email("max@mustermann.com")
-                .password("pass123")
+                .password("password")
                 .roles(new ArrayList<>(List.of("4")))
                 .build();
 
@@ -85,7 +91,7 @@ public class UserServiceTest {
     @Test
     void verifyLoginUser() {
         when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
-        ResponseEntity<?> response = userService.loginUser("max@mustermann.com", "pass123");
+        ResponseEntity<?> response = userService.loginUser("max@mustermann.com", "password");
 
         assertThat(response).isNotNull();
         assertThat(response.getBody()).isEqualTo("Login successful!");
@@ -258,7 +264,6 @@ public class UserServiceTest {
                 .lastname("Mustermann")
                 .email("max1@mustermann.com")
                 .colorNumber(4)
-                .password("pass123")
                 .roles(new ArrayList<>())
                 .build();
 
@@ -274,15 +279,17 @@ public class UserServiceTest {
 
     @Test
     void verifyEditUser() {
-        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
-        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+
+        when(userRepository.findByEmail("max@mustermann.com"))
+                .thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userToRolesRepository.save(any(UserToRoles.class))).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenReturn(UserDto.toEntity(userDto));
 
         User user1 = User.builder()
                 .firstname("Max")
                 .lastname("Mustermann")
                 .email("max1@mustermann.com")
                 .colorNumber(4)
-                .password("pass123")
                 .roles(new ArrayList<>())
                 .build();
 
@@ -305,8 +312,10 @@ public class UserServiceTest {
 
     @Test
     void verifyEditUserNoChange() {
-        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
-        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+        when(userRepository.findByEmail("max@mustermann.com"))
+                .thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userToRolesRepository.save(any(UserToRoles.class))).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenReturn(UserDto.toEntity(userDto));
 
         ResponseEntity<?> response = userService.editUser(userDto, "max@mustermann.com");
 
@@ -317,15 +326,16 @@ public class UserServiceTest {
 
     @Test
     void verifyEditUserNewRole() {
-        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
-        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+        when(userRepository.findByEmail("max@mustermann.com"))
+                .thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userToRolesRepository.save(any(UserToRoles.class))).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenReturn(UserDto.toEntity(userDto));
 
         User user1 = User.builder()
                 .firstname("Max")
                 .lastname("Mustermann")
                 .email("max1@mustermann.com")
                 .colorNumber(4)
-                .password("pass123")
                 .roles(new ArrayList<>())
                 .build();
 
@@ -356,15 +366,16 @@ public class UserServiceTest {
 
     @Test
     void verifyEditUserRemoveRole() {
-        when(userRepository.findByEmail("max@mustermann.com")).thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
-        when(userRepository.save(UserDto.toEntity(userDto))).thenReturn(UserDto.toEntity(userDto));
+        when(userRepository.findByEmail("max@mustermann.com"))
+                .thenReturn(Optional.ofNullable(UserDto.toEntity(userDto)));
+        when(userToRolesRepository.save(any(UserToRoles.class))).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenReturn(UserDto.toEntity(userDto));
 
         User user1 = User.builder()
                 .firstname("Max")
                 .lastname("Mustermann")
                 .email("max1@mustermann.com")
                 .colorNumber(4)
-                .password("pass123")
                 .roles(new ArrayList<>())
                 .build();
 

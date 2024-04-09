@@ -38,15 +38,6 @@
                     </span>
                 </template>
             </v-select>
- 
-            <v-text-body>Password</v-text-body>
-            <v-text-field class="mt-1" 
-                :rules="[rules.required, rules.counter]"
-                :type="show ? 'text' : 'password'" :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append-inner="show = !show"
-                v-model="user.password" required variant="outlined"
-                autocomplete="off"
-                />
         </v-card-text>
 
         <v-card-actions>
@@ -135,7 +126,6 @@
                     { field: user.firstname, validators: [rules.required, rules.counter] },
                     { field: user.lastname, validators: [rules.required, rules.counter] },
                     { field: user.email, validators: [rules.required, rules.email] },
-                    { field: user.password, validators: [rules.required, rules.counter] },
                     { field: this.selectedRoles, validators: [rules.required, rules.roles] }
                 ];
 
@@ -159,7 +149,6 @@
                         this.item.lastname = user.lastname;
                         this.item.email = user.email;
                         this.item.roles = this.selectedRoles;
-                        this.item.password = user.password;
                         this.$emit('cancel');
                     } else {
                         alert(response.data);

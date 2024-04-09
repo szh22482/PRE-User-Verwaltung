@@ -13,6 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -31,7 +36,7 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .filter(user -> !user.getDeleted())
-                .map(UserDto::fromEntity)
+                .map(UserDto::fromEntityWithRoleNames)
                 .toList();
     }
 
@@ -46,15 +51,11 @@ public class UserService {
         //Get actual user from optional
         User user = optionalUser.get();
 
-        if(!checkPassword(user, password)) {
+        if(!checkPassword(password, user.getSalt(), user.getHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login, password wrong");
         }
 
         return ResponseEntity.status(HttpStatus.OK).body("Login successful!");
-    }
-
-    private boolean checkPassword(User user, String password) {
-        return user.getPassword().equals(password);
     }
 
     public ResponseEntity<?> addUser(UserRequest userRequest) {
@@ -79,13 +80,16 @@ public class UserService {
         }
 
         try {
+            String salt = generateSalt();
+            String hash = calculateHash(userRequest.password(), salt);
             User user = User.builder()
                     .firstname(userRequest.firstname().toUpperCase().charAt(0) +
                             userRequest.firstname().substring(1).toLowerCase())
                     .lastname(userRequest.lastname().toUpperCase().charAt(0) +
                             userRequest.lastname().substring(1).toLowerCase())
                     .email(userRequest.email())
-                    .password(userRequest.password())
+                    .salt(salt)
+                    .hash(hash)
                     .colorNumber((int) (Math.random() * 7))
                     .build();
 
@@ -141,7 +145,6 @@ public class UserService {
         user.setFirstname(userDto.firstname());
         user.setLastname(userDto.lastname());
         user.setEmail(userDto.email());
-        user.setPassword(userDto.password());
 
         try {
             List<UserToRoles> rolesToDelete = new ArrayList<>();
@@ -194,5 +197,36 @@ public class UserService {
         userRepository.save(user);
 
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    private static boolean checkPassword(String password, String salt, String hash) {
+        return Objects.equals(hash, calculateHash(password, salt));
+    }
+
+    private static String generateSalt() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] salt = new byte[128 / 8];
+        secureRandom.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+    }
+
+    private static String calculateHash(String password, String salt) {
+        try {
+            byte[] saltBytes = Base64.getDecoder().decode(salt);
+            byte[] passwordBytes = password.getBytes();
+
+            Mac hmacSHA256 = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(saltBytes, "HmacSHA256");
+            hmacSHA256.init(secretKeySpec);
+
+            String hashPassword = Base64.getEncoder().encodeToString(hmacSHA256.doFinal(passwordBytes));
+            System.out.println("salt: " + salt);
+            System.out.println("hash: " + hashPassword);
+            System.out.println("hash: " + hashPassword);
+            return hashPassword;
+        } catch(NoSuchAlgorithmException | InvalidKeyException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
