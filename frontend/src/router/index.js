@@ -16,6 +16,11 @@ const routes = [
     path: '/add',
     name: 'Add',
     component: () => import( '@/views/AddUser.vue'),
+  },
+  {
+    path: '/invite',
+    name: 'Invite',
+    component: () => import( '@/views/InviteUser.vue'),
   }
 ]
 
