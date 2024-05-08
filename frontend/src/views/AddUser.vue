@@ -10,7 +10,7 @@
                 <v-row>
                 <v-col cols="12" sm="6">
                     <label for="">Firstname</label>
-                    <v-text-field 
+                    <v-text-field
                     variant="outlined"
                     class="inputfield" required
                     v-model="user.firstname"
@@ -19,7 +19,7 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                     <label for="">Lastname</label>
-                    <v-text-field 
+                    <v-text-field
                     variant="outlined"
                     class="inputfield"
                     v-model="user.lastname" required
@@ -31,19 +31,11 @@
                 <v-row>
                 <v-col cols="12" sm="6">
                     <label for="">E-Mail-Address</label>
-                    <v-text-field 
+                    <v-text-field
                     variant="outlined"
                     class="inputfield" required
                     v-model="user.email"
                     :rules="[rules.required, rules.email]"
-                    />
-                </v-col>
-                <v-col cols="12" sm="6">
-                    <label for="">Phone-Number</label>
-                    <v-text-field 
-                    variant="outlined"
-                    class="inputfield"
-                    v-model="user.phoneNumber"
                     />
                 </v-col>
                 </v-row>
@@ -51,13 +43,13 @@
                 <v-row>
                 <v-col cols="12" sm="6">
                     <label for="">Roles</label>
-                    <v-select 
+                    <v-select
                     clearable
-                    class="mt-1" 
-                    v-model="selectedRoles" 
+                    class="mt-1"
+                    v-model="selectedRoles"
                     multiple
-                    :items="roles" 
-                    variant="outlined" 
+                    :items="roles"
+                    variant="outlined"
                     required
                     >
                     <template v-slot:selection="{ item, index }">
@@ -72,16 +64,16 @@
                 </v-col>
                 <v-col cols="12" sm="6">
                     <label>Date of Birth</label>
-                    <v-text-field 
+                    <v-text-field
                     readonly
                     variant="outlined"
-                    @click="openDatePicker" 
-                    @focus="openDatePicker" 
+                    @click="openDatePicker"
+                    @focus="openDatePicker"
                     v-model="formattedDate"
-                    /> 
-                    <v-dialog 
-                    class="date-picker" 
-                    v-model="showDatePicker" 
+                    />
+                    <v-dialog
+                    class="date-picker"
+                    v-model="showDatePicker"
                     persistent
                     >
                     <v-container>
@@ -102,18 +94,18 @@
                 <v-row>
                 <v-col cols="12" sm="6">
                     <label for="">Password</label>
-                    <v-text-field 
+                    <v-text-field
                     variant="outlined"
-                    class="inputfield" 
+                    class="inputfield"
                     required
-                    v-model="user.password" 
+                    v-model="user.password"
                     type="password"
                     :rules="[rules.required, rules.counter]"
                     />
                 </v-col>
                 <v-col cols="12" sm="6">
                     <label for="">Confirm Password</label>
-                    <v-text-field 
+                    <v-text-field
                     variant="outlined"
                     class="inputfield"
                     type="password"
@@ -139,7 +131,7 @@
 <script setup>
     import axios from 'axios';
 </script>
-  
+
 <script>
     export default {
         data() {
@@ -181,7 +173,7 @@
             }
         },
         async mounted() {
-          
+
         },
         computed: {
             formattedDate() {
@@ -190,7 +182,7 @@
             maxDate() {
                 let today = new Date();
                 var dd = today.getDate();
-                var mm = today.getMonth()+1; 
+                var mm = today.getMonth()+1;
                 var yyyy = today.getFullYear();
                 today = yyyy + '-' + mm + '-' + dd;
                 return today;
@@ -261,7 +253,7 @@
                     }
                 } catch (error) {
                     console.error(error);
-                }      
+                }
             },
             handleDateUpdate(newDate) {
                 this.dob = newDate;
